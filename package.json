@@ -1,0 +1,24 @@
+{
+  "name": "doom-platformer",
+  "version": "1.0.0",
+  "description": "A 2D side-scrolling platformer game with Doom aesthetic",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "nodemon server/index.js"
+  },
+  "keywords": [
+    "game",
+    "platformer",
+    "doom",
+    "canvas"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
