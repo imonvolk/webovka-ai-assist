@@ -2189,15 +2189,15 @@ const LEVELS = [
             { type: 'patrol', x: 45, y: 5 }
         ],
         pickups: [
-            { type: 'health', x: 8, y: 11 },
-            { type: 'shotgun', x: 18, y: 9 },
-            { type: 'ammo', x: 28, y: 7 },
-            { type: 'health', x: 38, y: 5 },
-            { type: 'coin', x: 6, y: 11 },
-            { type: 'coin', x: 14, y: 10 },
-            { type: 'coin', x: 25, y: 8 },
-            { type: 'coin', x: 32, y: 7 },
-            { type: 'coin', x: 42, y: 5 }
+            { type: 'health', x: 8, y: 12 },
+            { type: 'shotgun', x: 18, y: 10 },
+            { type: 'ammo', x: 28, y: 8 },
+            { type: 'health', x: 38, y: 6 },
+            { type: 'coin', x: 6, y: 12 },
+            { type: 'coin', x: 14, y: 11 },
+            { type: 'coin', x: 25, y: 9 },
+            { type: 'coin', x: 32, y: 8 },
+            { type: 'coin', x: 42, y: 6 }
         ],
         checkpoints: [
             { x: 15, y: 9 },
@@ -2237,19 +2237,19 @@ const LEVELS = [
             { type: 'flying', x: 55, y: 6 }
         ],
         pickups: [
-            { type: 'health', x: 10, y: 11 },
-            { type: 'ammo', x: 18, y: 9 },
-            { type: 'machinegun', x: 25, y: 7 },
-            { type: 'health', x: 33, y: 5 },
-            { type: 'armor', x: 40, y: 3 },
-            { type: 'ammo', x: 48, y: 8 },
-            { type: 'health', x: 55, y: 3 },
-            { type: 'coin', x: 8, y: 11 },
-            { type: 'coin', x: 16, y: 9 },
-            { type: 'coin', x: 24, y: 7 },
-            { type: 'coin', x: 32, y: 5 },
-            { type: 'coin', x: 44, y: 6 },
-            { type: 'coin', x: 52, y: 8 }
+            { type: 'health', x: 10, y: 12 },
+            { type: 'ammo', x: 18, y: 10 },
+            { type: 'machinegun', x: 25, y: 8 },
+            { type: 'health', x: 33, y: 6 },
+            { type: 'armor', x: 40, y: 4 },
+            { type: 'ammo', x: 48, y: 9 },
+            { type: 'health', x: 55, y: 4 },
+            { type: 'coin', x: 8, y: 12 },
+            { type: 'coin', x: 16, y: 10 },
+            { type: 'coin', x: 24, y: 8 },
+            { type: 'coin', x: 32, y: 6 },
+            { type: 'coin', x: 44, y: 7 },
+            { type: 'coin', x: 52, y: 9 }
         ],
         checkpoints: [
             { x: 15, y: 9 },
@@ -2292,24 +2292,24 @@ const LEVELS = [
             { type: 'shooter', x: 67, y: 2 }
         ],
         pickups: [
-            { type: 'health', x: 8, y: 11 },
-            { type: 'ammo', x: 15, y: 9 },
-            { type: 'armor', x: 22, y: 6 },
-            { type: 'plasma', x: 30, y: 9 },
-            { type: 'health', x: 38, y: 5 },
-            { type: 'ammo', x: 46, y: 3 },
-            { type: 'rocket', x: 53, y: 7 },
-            { type: 'health', x: 60, y: 4 },
-            { type: 'invincibility', x: 35, y: 2 },
-            { type: 'coin', x: 7, y: 11 },
-            { type: 'coin', x: 14, y: 9 },
-            { type: 'coin', x: 21, y: 6 },
-            { type: 'coin', x: 29, y: 9 },
-            { type: 'coin', x: 37, y: 5 },
-            { type: 'coin', x: 45, y: 3 },
-            { type: 'coin', x: 52, y: 7 },
-            { type: 'coin', x: 59, y: 4 },
-            { type: 'coin', x: 66, y: 2 }
+            { type: 'health', x: 8, y: 12 },
+            { type: 'ammo', x: 15, y: 10 },
+            { type: 'armor', x: 22, y: 7 },
+            { type: 'plasma', x: 30, y: 10 },
+            { type: 'health', x: 38, y: 6 },
+            { type: 'ammo', x: 46, y: 4 },
+            { type: 'rocket', x: 53, y: 8 },
+            { type: 'health', x: 60, y: 5 },
+            { type: 'invincibility', x: 35, y: 3 },
+            { type: 'coin', x: 7, y: 12 },
+            { type: 'coin', x: 14, y: 10 },
+            { type: 'coin', x: 21, y: 7 },
+            { type: 'coin', x: 29, y: 10 },
+            { type: 'coin', x: 37, y: 6 },
+            { type: 'coin', x: 45, y: 4 },
+            { type: 'coin', x: 52, y: 8 },
+            { type: 'coin', x: 59, y: 5 },
+            { type: 'coin', x: 66, y: 3 }
         ],
         checkpoints: [
             { x: 12, y: 11 },
@@ -2345,19 +2345,19 @@ const LEVELS = [
             { type: 'boss', x: 45, y: 6 }
         ],
         pickups: [
-            { type: 'health', x: 5, y: 11 },
-            { type: 'armor', x: 8, y: 11 },
-            { type: 'health', x: 12, y: 9 },
-            { type: 'ammo', x: 16, y: 9 },
-            { type: 'rocket', x: 20, y: 7 },
-            { type: 'plasma', x: 24, y: 7 },
-            { type: 'health', x: 28, y: 5 },
-            { type: 'armor', x: 32, y: 5 },
-            { type: 'invincibility', x: 30, y: 2 },
-            { type: 'ammo', x: 40, y: 7 },
-            { type: 'health', x: 48, y: 9 },
-            { type: 'armor', x: 52, y: 9 },
-            { type: 'health', x: 55, y: 11 },
+            { type: 'health', x: 5, y: 12 },
+            { type: 'armor', x: 8, y: 12 },
+            { type: 'health', x: 12, y: 10 },
+            { type: 'ammo', x: 16, y: 10 },
+            { type: 'rocket', x: 20, y: 8 },
+            { type: 'plasma', x: 24, y: 8 },
+            { type: 'health', x: 28, y: 6 },
+            { type: 'armor', x: 32, y: 6 },
+            { type: 'invincibility', x: 30, y: 3 },
+            { type: 'ammo', x: 40, y: 8 },
+            { type: 'health', x: 48, y: 10 },
+            { type: 'armor', x: 52, y: 10 },
+            { type: 'health', x: 55, y: 12 },
             { type: 'coin', x: 10, y: 11 },
             { type: 'coin', x: 15, y: 9 },
             { type: 'coin', x: 22, y: 7 },
@@ -2401,7 +2401,9 @@ class InputHandler {
             left: false,
             right: false,
             jump: false,
-            shoot: false
+            shoot: false,
+            up: false,
+            down: false
         };
         this.jumpPressed = false;
         this.shootPressed = false;
@@ -2484,6 +2486,22 @@ class InputHandler {
                 break;
             case 'ArrowUp':
             case 'KeyW':
+                // Up key for aiming or jumping
+                this.keys.up = true;
+                if (e.code === 'KeyW' || !this.keys.shoot) {
+                    // W or up without shooting = jump
+                    if (!this.keys.jump) {
+                        this.jumpPressed = true;
+                    }
+                    this.keys.jump = true;
+                }
+                e.preventDefault();
+                break;
+            case 'ArrowDown':
+            case 'KeyS':
+                this.keys.down = true;
+                e.preventDefault();
+                break;
             case 'Space':
                 if (!this.keys.jump) {
                     this.jumpPressed = true;
@@ -2578,6 +2596,15 @@ class InputHandler {
                 break;
             case 'ArrowUp':
             case 'KeyW':
+                this.keys.up = false;
+                if (e.code === 'KeyW') {
+                    this.keys.jump = false;
+                }
+                break;
+            case 'ArrowDown':
+            case 'KeyS':
+                this.keys.down = false;
+                break;
             case 'Space':
                 this.keys.jump = false;
                 break;
@@ -3908,19 +3935,43 @@ class Player {
 
         if (input.consumeShoot() && this.shootCooldown <= 0) {
             if (this.ammo[this.currentWeapon] > 0 || this.currentWeapon === 'pistol') {
-                this.shoot(projectiles, particleSystem);
+                const shootDir = this.shoot(input, projectiles, particleSystem);
                 this.shootCooldown = weapon.fireRate;
                 if (this.currentWeapon !== 'pistol') {
                     this.ammo[this.currentWeapon]--;
+                }
+                
+                // Rocket jumping - if shooting down with rocket launcher
+                if (this.currentWeapon === 'rocket' && shootDir.y > 0.5) {
+                    // Apply upward velocity for rocket jump
+                    this.velocityY = -450;
+                    if (screenShake) screenShake.shake(10, 0.25);
                 }
             }
         }
     }
 
-    shoot(projectiles, particleSystem) {
+    shoot(input, projectiles, particleSystem) {
         const weapon = WEAPONS[this.currentWeapon];
-        const startX = this.x + (this.facingRight ? this.width : 0);
-        const startY = this.y + this.height / 2 - 4;
+        
+        // Determine shoot direction based on input
+        let shootAngle = 0;
+        let aimingUp = false;
+        let aimingDown = false;
+        
+        if (input.keys.up && input.keys.shoot) {
+            shootAngle = -Math.PI / 2; // Straight up
+            aimingUp = true;
+        } else if (input.keys.down && input.keys.shoot) {
+            shootAngle = Math.PI / 2; // Straight down
+            aimingDown = true;
+        } else {
+            // Normal horizontal shooting
+            shootAngle = this.facingRight ? 0 : Math.PI;
+        }
+        
+        const startX = this.x + this.width / 2;
+        const startY = aimingUp ? this.y : aimingDown ? this.y + this.height : this.y + this.height / 2 - 4;
         const direction = this.facingRight ? 1 : -1;
 
         // Muzzle flash
@@ -3958,9 +4009,9 @@ class Player {
         // Fire projectiles
         for (let i = 0; i < weapon.projectileCount; i++) {
             const spread = (Math.random() - 0.5) * weapon.spread;
-            const angle = spread;
-            const vx = Math.cos(angle) * weapon.projectileSpeed * direction;
-            const vy = Math.sin(angle) * weapon.projectileSpeed;
+            const finalAngle = shootAngle + spread;
+            const vx = Math.cos(finalAngle) * weapon.projectileSpeed;
+            const vy = Math.sin(finalAngle) * weapon.projectileSpeed;
 
             const projectile = new Projectile(startX, startY, vx, vy, true, this.currentWeapon);
             projectile.damage = weapon.damage;
@@ -3968,6 +4019,12 @@ class Player {
         }
 
         this.stats.shotsFired++;
+        
+        // Return shoot direction for rocket jumping
+        return {
+            x: Math.cos(shootAngle),
+            y: Math.sin(shootAngle)
+        };
     }
 
     takeDamage(amount, particleSystem) {
