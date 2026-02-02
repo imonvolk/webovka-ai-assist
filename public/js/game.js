@@ -2176,162 +2176,217 @@ const fpsCounter = document.getElementById('fps-counter');
 // ============================================================================
 
 const LEVELS = [
-    // Level 1 - Introduction (easy platforming, learn controls)
+    // Level 1 - ENTRANCE TO HELL - Tutorial level with safe learning
     {
         name: "ENTRANCE TO HELL",
         playerStart: { x: 2, y: 11 },
-        width: 35,
+        width: 50,
         height: 15,
         enemies: [
-            { type: 'patrol', x: 15, y: 7 },
-            { type: 'patrol', x: 25, y: 4 }
-        ],
-        pickups: [
-            { type: 'health', x: 20, y: 7 },
-            { type: 'shotgun', x: 28, y: 5 },
-            { type: 'coin', x: 8, y: 9 },
-            { type: 'coin', x: 12, y: 8 },
-            { type: 'coin', x: 22, y: 6 }
-        ],
-        data: [
-            "11111111111111111111111111111111111",
-            "10000000000000000000000000000000001",
-            "10000000000000000000000000000000001",
-            "10000000000000000000000000000000051",
-            "10000000000000000000000000000011111",
-            "10000000000000000000000000011100001",
-            "10000000000000000000000011100000001",
-            "10000000000000000000111000000000001",
-            "10000000000000000110000000000000001",
-            "10000000000001110000000000000000001",
-            "10000000011100000000000000000000001",
-            "10000001100000000000000000000000001",
-            "10000000000000000000000000000000001",
-            "11111111111111111111111111111111111",
-            "11111111111111111111111111111111111"
-        ]
-    },
-    // Level 2 - Platforming with hazards
-    {
-        name: "THE BLOOD PITS",
-        playerStart: { x: 2, y: 11 },
-        width: 45,
-        height: 15,
-        enemies: [
-            { type: 'patrol', x: 18, y: 8 },
-            { type: 'shooter', x: 30, y: 5 },
-            { type: 'flying', x: 25, y: 4 },
-            { type: 'patrol', x: 38, y: 4 }
-        ],
-        pickups: [
-            { type: 'health', x: 15, y: 10 },
-            { type: 'ammo', x: 22, y: 7 },
-            { type: 'machinegun', x: 35, y: 5 },
-            { type: 'health', x: 40, y: 4 },
-            { type: 'coin', x: 10, y: 10 },
-            { type: 'coin', x: 20, y: 9 },
-            { type: 'coin', x: 28, y: 6 },
-            { type: 'coin', x: 36, y: 4 }
-        ],
-        data: [
-            "111111111111111111111111111111111111111111111",
-            "100000000000000000000000000000000000000000001",
-            "100000000000000000000000000000000000000000001",
-            "100000000000000000000000000000000000000000051",
-            "100000000000000000000000000000000000000001111",
-            "100000000000000000000000000000000000022200001",
-            "100000000000000000000000000000000011100000001",
-            "100000000000000000000000000002220000000000001",
-            "100000000000000000000000011100000000000000001",
-            "100000000000000000000011000000000000000000001",
-            "100000000000000002220000000000000000000000001",
-            "100000000000011100000000000000000000000000001",
-            "100000000011000000000000000000000000000000001",
-            "111111133311111111331111111133111111111111111",
-            "111111111111111111111111111111111111111111111"
-        ]
-    },
-    // Level 3 - Advanced Challenge
-    {
-        name: "DEMON'S LAIR",
-        playerStart: { x: 2, y: 11 },
-        width: 55,
-        height: 15,
-        enemies: [
-            { type: 'patrol', x: 12, y: 11 },
-            { type: 'flying', x: 20, y: 6 },
-            { type: 'shooter', x: 28, y: 9 },
+            { type: 'patrol', x: 10, y: 11 },
+            { type: 'patrol', x: 22, y: 9 },
             { type: 'patrol', x: 35, y: 7 },
-            { type: 'flying', x: 40, y: 4 },
-            { type: 'shooter', x: 48, y: 3 }
+            { type: 'patrol', x: 45, y: 5 }
         ],
         pickups: [
             { type: 'health', x: 8, y: 11 },
-            { type: 'ammo', x: 18, y: 11 },
-            { type: 'plasma', x: 32, y: 8 },
-            { type: 'health', x: 42, y: 5 },
-            { type: 'ammo', x: 50, y: 3 },
+            { type: 'shotgun', x: 18, y: 9 },
+            { type: 'ammo', x: 28, y: 7 },
+            { type: 'health', x: 38, y: 5 },
             { type: 'coin', x: 6, y: 11 },
-            { type: 'coin', x: 15, y: 10 },
-            { type: 'coin', x: 24, y: 9 },
-            { type: 'coin', x: 36, y: 7 },
-            { type: 'coin', x: 45, y: 4 }
+            { type: 'coin', x: 14, y: 10 },
+            { type: 'coin', x: 25, y: 8 },
+            { type: 'coin', x: 32, y: 7 },
+            { type: 'coin', x: 42, y: 5 }
+        ],
+        checkpoints: [
+            { x: 15, y: 9 },
+            { x: 30, y: 7 }
         ],
         data: [
-            "1111111111111111111111111111111111111111111111111111111",
-            "1000000000000000000000000000000000000000000000000000001",
-            "1000000000000000000000000000000000000000000000000000051",
-            "1000000000000000000000000000000000000000000000000001111",
-            "1000000000000000000000000000000000000000000000000110001",
-            "1000000000000000000000000000000000000000000002220000001",
-            "1000000000000000000000000000000000000000001110000000001",
-            "1000000000000000000000000000000000000222000000000000001",
-            "1000000000000000000000000000000000111000000000000000001",
-            "1000000000000000000000000000022200000000000000000000001",
-            "1000000000000000000000000011100000000000000000000000001",
-            "1000000000000000000000011000000000000000000000000000001",
-            "1000000000000002220001100000000000000000000000000000001",
-            "1111111111111111111111111133311111133311111133311111111",
-            "1111111111111111111111111111111111111111111111111111111"
+            "11111111111111111111111111111111111111111111111111",
+            "10000000000000000000000000000000000000000000000001",
+            "10000000000000000000000000000000000000000000000001",
+            "10000000000000000000000000000000000000000000000001",
+            "10000000000000000000000000000000000000000000000051",
+            "10000000000000000000000000000000000000000000011111",
+            "10000000000000000000000000000000000000000011100001",
+            "10000000000000000000000000000000000000011100000001",
+            "10000000000000000000000000000000000011000000000001",
+            "10000000000000000000000000000000110000000000000001",
+            "10000000000000000000000001110000000000000000000001",
+            "10000000000000000001111000000000000000000000000001",
+            "10000000000001111000000000000000000000000000000001",
+            "11111111111111111111111111111111111111111111111111",
+            "11111111111111111111111111111111111111111111111111"
         ]
     },
-    // Level 4 - Boss Fight
+    // Level 2 - THE BLOOD PITS - Multi-path with verticality
     {
-        name: "THE THRONE ROOM",
+        name: "THE BLOOD PITS",
         playerStart: { x: 2, y: 11 },
-        width: 40,
+        width: 60,
         height: 15,
         enemies: [
-            { type: 'boss', x: 30, y: 5 }
+            { type: 'patrol', x: 12, y: 11 },
+            { type: 'shooter', x: 20, y: 7 },
+            { type: 'patrol', x: 28, y: 9 },
+            { type: 'flying', x: 35, y: 5 },
+            { type: 'shooter', x: 42, y: 3 },
+            { type: 'patrol', x: 50, y: 8 },
+            { type: 'flying', x: 55, y: 6 }
+        ],
+        pickups: [
+            { type: 'health', x: 10, y: 11 },
+            { type: 'ammo', x: 18, y: 9 },
+            { type: 'machinegun', x: 25, y: 7 },
+            { type: 'health', x: 33, y: 5 },
+            { type: 'armor', x: 40, y: 3 },
+            { type: 'ammo', x: 48, y: 8 },
+            { type: 'health', x: 55, y: 3 },
+            { type: 'coin', x: 8, y: 11 },
+            { type: 'coin', x: 16, y: 9 },
+            { type: 'coin', x: 24, y: 7 },
+            { type: 'coin', x: 32, y: 5 },
+            { type: 'coin', x: 44, y: 6 },
+            { type: 'coin', x: 52, y: 8 }
+        ],
+        checkpoints: [
+            { x: 15, y: 9 },
+            { x: 30, y: 5 },
+            { x: 47, y: 8 }
+        ],
+        data: [
+            "111111111111111111111111111111111111111111111111111111111111",
+            "100000000000000000000000000000000000000000000000000000000001",
+            "100000000000000000000000000000000000000000000000000000000001",
+            "100000000000000000000000000000000000000000000000000000000051",
+            "100000000000000000000000000000000000000000000000000000011111",
+            "100000000000000000000000000000000000000000000000000011100001",
+            "100000000000000000000000000000000000000000000000011100000001",
+            "100000000000000000000000000000000000000000000111000000000001",
+            "100000000000000000000000000000000000000011110000000000000001",
+            "100000000000000000000000000000000111100000000000000000000001",
+            "100000000000000000000000001111000000000000000000000000000001",
+            "100000000000000011111000000000000000000000000000000000000001",
+            "100000000011111000000000000000000000000000000000000000000001",
+            "111111133311111133311111133311111133311111133311111133311111",
+            "111111111111111111111111111111111111111111111111111111111111"
+        ]
+    },
+    // Level 3 - DEMON'S LAIR - Complex multi-tier platforming
+    {
+        name: "DEMON'S LAIR",
+        playerStart: { x: 2, y: 11 },
+        width: 70,
+        height: 15,
+        enemies: [
+            { type: 'patrol', x: 10, y: 11 },
+            { type: 'flying', x: 18, y: 8 },
+            { type: 'shooter', x: 25, y: 6 },
+            { type: 'patrol', x: 32, y: 9 },
+            { type: 'flying', x: 40, y: 5 },
+            { type: 'shooter', x: 48, y: 3 },
+            { type: 'patrol', x: 55, y: 7 },
+            { type: 'flying', x: 62, y: 4 },
+            { type: 'shooter', x: 67, y: 2 }
+        ],
+        pickups: [
+            { type: 'health', x: 8, y: 11 },
+            { type: 'ammo', x: 15, y: 9 },
+            { type: 'armor', x: 22, y: 6 },
+            { type: 'plasma', x: 30, y: 9 },
+            { type: 'health', x: 38, y: 5 },
+            { type: 'ammo', x: 46, y: 3 },
+            { type: 'rocket', x: 53, y: 7 },
+            { type: 'health', x: 60, y: 4 },
+            { type: 'invincibility', x: 35, y: 2 },
+            { type: 'coin', x: 7, y: 11 },
+            { type: 'coin', x: 14, y: 9 },
+            { type: 'coin', x: 21, y: 6 },
+            { type: 'coin', x: 29, y: 9 },
+            { type: 'coin', x: 37, y: 5 },
+            { type: 'coin', x: 45, y: 3 },
+            { type: 'coin', x: 52, y: 7 },
+            { type: 'coin', x: 59, y: 4 },
+            { type: 'coin', x: 66, y: 2 }
+        ],
+        checkpoints: [
+            { x: 12, y: 11 },
+            { x: 27, y: 6 },
+            { x: 42, y: 5 },
+            { x: 58, y: 7 }
+        ],
+        data: [
+            "1111111111111111111111111111111111111111111111111111111111111111111111",
+            "1000000000000000000000000000000000000000000000000000000000000000000001",
+            "1000000000000000000000000000000000000000000000000000000000000000000051",
+            "1000000000000000000000000000000000000000000000000000000000000000011111",
+            "1000000000000000000000000000000000000000000000000000000000000011100001",
+            "1000000000000000000000000000000000000000000000000000000000011100000001",
+            "1000000000000000000000000000000000000000000000000000000011000000000001",
+            "1000000000000000000000000000000000000000000000000011000000000000000001",
+            "1000000000000000000000000000000000000000000000111000000000000000000001",
+            "1000000000000000000000000000000000000000011100000000000000000000000001",
+            "1000000000000000000000000000000000001110000000000000000000000000000001",
+            "1000000000000000000000000000001111000000000000000000000000000000000001",
+            "1000000000000000000001111100000000000000000000000000000000000000000001",
+            "1111111133311111133311111133311111133311111133311111133311111133311111",
+            "1111111111111111111111111111111111111111111111111111111111111111111111"
+        ]
+    },
+    // Level 4 - THE CYBERDEMON'S THRONE - Boss arena with escape routes
+    {
+        name: "THE CYBERDEMON'S THRONE",
+        playerStart: { x: 3, y: 11 },
+        width: 60,
+        height: 15,
+        enemies: [
+            { type: 'boss', x: 45, y: 6 }
         ],
         pickups: [
             { type: 'health', x: 5, y: 11 },
-            { type: 'armor', x: 10, y: 11 },
-            { type: 'rocket', x: 15, y: 11 },
-            { type: 'invincibility', x: 20, y: 11 },
-            { type: 'health', x: 35, y: 11 },
-            { type: 'coin', x: 8, y: 11 },
-            { type: 'coin', x: 25, y: 11 }
+            { type: 'armor', x: 8, y: 11 },
+            { type: 'health', x: 12, y: 9 },
+            { type: 'ammo', x: 16, y: 9 },
+            { type: 'rocket', x: 20, y: 7 },
+            { type: 'plasma', x: 24, y: 7 },
+            { type: 'health', x: 28, y: 5 },
+            { type: 'armor', x: 32, y: 5 },
+            { type: 'invincibility', x: 30, y: 2 },
+            { type: 'ammo', x: 40, y: 7 },
+            { type: 'health', x: 48, y: 9 },
+            { type: 'armor', x: 52, y: 9 },
+            { type: 'health', x: 55, y: 11 },
+            { type: 'coin', x: 10, y: 11 },
+            { type: 'coin', x: 15, y: 9 },
+            { type: 'coin', x: 22, y: 7 },
+            { type: 'coin', x: 30, y: 5 },
+            { type: 'coin', x: 38, y: 7 },
+            { type: 'coin', x: 45, y: 9 },
+            { type: 'coin', x: 50, y: 9 }
         ],
         checkpoints: [
-            { x: 10, y: 11 }
+            { x: 10, y: 11 },
+            { x: 25, y: 7 },
+            { x: 50, y: 9 }
         ],
         data: [
-            "1111111111111111111111111111111111111111",
-            "1000000000000000000000000000000000000001",
-            "1000000000000000000000000000000000000001",
-            "1000000000000000000000000000000000000001",
-            "1000000000000000000000000000000000000001",
-            "1000000000000000000000000000000000000051",
-            "1000000000000000000000000000000000000011",
-            "1000000000000000000000000000000000000001",
-            "1000000000000000000000000000000000000001",
-            "1000000000000000000000000000000000000001",
-            "1000000000000000000000000000000000000001",
-            "1000000000000000000000000000000000000001",
-            "1000000000000000000000000000000000000001",
-            "1111111111111111111111111111111111111111",
-            "1111111111111111111111111111111111111111"
+            "111111111111111111111111111111111111111111111111111111111111",
+            "100000000000000000000000000000000000000000000000000000000001",
+            "100000000000000000000000000000000000000000000000000000000001",
+            "100000000000000000000000000000000000000000000000000000000001",
+            "100000000000000000000000000000000000000000000000000000000001",
+            "100000000000000000000000000000000000000000000000000000000001",
+            "100000000000000000000000000000000000000000000000000000000001",
+            "100000002220000000000022200000000000002220000000000022200001",
+            "100000000000000000000000000000000000000000000000000000000001",
+            "100000000000000022200000000000000000000000002220000000000001",
+            "100000000000220000000000000000000000000000000000220000000001",
+            "100000002200000000000000000000000000000000000000002200000001",
+            "100000000000000000000000000000000000000000000000000000000001",
+            "111111111111111111111111111111111111111111111111111111111111",
+            "111111111111111111111111111111111111111111111111111111111111"
         ]
     }
 ];
@@ -4806,215 +4861,605 @@ class FlyingEnemy extends Enemy {
 }
 
 // ============================================================================
-// BOSS ENEMY - Large enemy with multiple attack patterns
+// ============================================================================
+// BOSS ENEMY - The Cyberdemon Lord
+// Three-phase boss with unique attack patterns
 // ============================================================================
 
 class BossEnemy extends Enemy {
     constructor(x, y) {
         super(x, y, 'boss');
-        this.width = 80;
-        this.height = 100;
-        this.health = 500 * getDifficulty().enemyHealthMultiplier;
+        this.width = 96;
+        this.height = 120;
+        this.health = 800 * getDifficulty().enemyHealthMultiplier;
         this.maxHealth = this.health;
-        this.damage = 25 * getDifficulty().enemyDamageMultiplier;
-        this.detectionRange = 500;
+        this.damage = 30 * getDifficulty().enemyDamageMultiplier;
+        this.detectionRange = 2000;
+        this.moveSpeed = 180;
 
-        // Boss phases
+        // Boss phases (1=normal, 2=damaged, 3=enraged)
         this.phase = 1;
         this.phaseThresholds = [0.66, 0.33];
+        this.invulnerable = false;
+        this.invulnerableTimer = 0;
 
-        // Attack patterns
+        // Attack system
         this.attackPattern = 'idle';
         this.attackTimer = 0;
-        this.attackDuration = 0;
-        this.patternCooldown = 0;
-
-        // Movement
+        this.attackCooldown = 0;
+        this.attackSubTimer = 0;
+        
+        // Movement patterns
+        this.targetX = x;
+        this.targetY = y;
         this.baseY = y;
-        this.hoverOffset = 0;
-        this.chargeTarget = null;
-        this.isCharging = false;
-        this.chargeSpeed = 400;
+        this.hoverTime = 0;
+        this.teleportCooldown = 0;
+        this.isGrounded = true;
 
-        // Projectile spawning
-        this.burstCount = 0;
-        this.burstDelay = 0;
-
-        // Visual
-        this.eyeGlow = 0;
+        // Attack-specific variables
+        this.fireballCount = 0;
+        this.waveCount = 0;
+        this.spiralAngle = 0;
+        this.summonCount = 0;
+        this.groundPoundActive = false;
+        this.laserChargeTime = 0;
+        this.laserActive = false;
+        this.laserAngle = 0;
+        this.shockwaveRadius = 0;
+        
+        // Minions
+        this.minions = [];
+        
+        // Visual effects
+        this.eyeGlow = 1;
         this.shakeIntensity = 0;
+        this.auraSize = 0;
+        this.crackProgress = 0;
+        this.phaseTransitionTimer = 0;
+
+        // Combat tracking
+        this.lastDamageTaken = 0;
+        this.enrageActivated = false;
     }
 
-    updateAI(dt, player, projectiles) {
-        if (player.isDead) {
-            this.attackPattern = 'idle';
+    update(dt, tileMap, player, projectiles) {
+        if (this.isDead) {
+            this.deathTimer -= dt;
+            this.deathAnimationTimer += dt;
             return;
         }
 
-        const healthPercent = this.health / this.maxHealth;
-        if (healthPercent <= this.phaseThresholds[1] && this.phase < 3) {
-            this.phase = 3;
-            this.onPhaseChange();
-        } else if (healthPercent <= this.phaseThresholds[0] && this.phase < 2) {
-            this.phase = 2;
-            this.onPhaseChange();
-        }
-
-        this.attackTimer -= dt;
-        if (this.patternCooldown > 0) this.patternCooldown -= dt;
-        if (this.burstDelay > 0) this.burstDelay -= dt;
-
-        this.hoverOffset = Math.sin(Date.now() / 500) * 10;
-        this.eyeGlow = Math.sin(Date.now() / 200) * 0.3 + 0.7;
-        this.shakeIntensity *= 0.95;
-
-        switch (this.attackPattern) {
-            case 'idle':
-                this.executeIdle(dt, player, projectiles);
-                break;
-            case 'spray':
-                this.executeSpray(dt, player, projectiles);
-                break;
-            case 'charge':
-                this.executeCharge(dt, player);
-                break;
-            case 'barrage':
-                this.executeBarrage(dt, player, projectiles);
-                break;
-        }
-
-        if (this.patternCooldown <= 0 && this.attackPattern === 'idle') {
-            this.chooseAttackPattern(player);
-        }
-    }
-
-    onPhaseChange() {
-        if (screenShake) screenShake.shake(15, 0.5);
-        if (soundSystem) soundSystem.playTone(50, 0.5, 'sawtooth', 0.5);
-        this.shakeIntensity = 10;
-        if (particleSystem) {
-            particleSystem.emitExplosion(this.x + this.width / 2, this.y + this.height / 2, '#ff0000');
-        }
-    }
-
-    chooseAttackPattern(player) {
-        const patterns = ['spray', 'charge'];
-        if (this.phase >= 2) patterns.push('barrage');
-        this.attackPattern = patterns[Math.floor(Math.random() * patterns.length)];
-        this.attackTimer = 0;
-
-        switch (this.attackPattern) {
-            case 'spray':
-                this.attackDuration = 2.0;
-                this.burstCount = 8 + this.phase * 4;
-                break;
-            case 'charge':
-                this.attackDuration = 1.5;
-                this.chargeTarget = { x: player.x, y: player.y };
-                this.isCharging = false;
-                break;
-            case 'barrage':
-                this.attackDuration = 3.0;
-                this.burstCount = 20;
-                this.burstDelay = 0;
-                break;
-        }
-    }
-
-    executeIdle(dt, player, projectiles) {
-        this.facePlayer(player);
-        const dx = player.x - this.x;
-        this.velocityX = Math.sign(dx) * 50;
-    }
-
-    executeSpray(dt, player, projectiles) {
-        this.attackTimer += dt;
-        this.facePlayer(player);
-        this.velocityX = 0;
-
-        if (this.burstCount > 0 && this.burstDelay <= 0) {
-            const angleOffset = (this.burstCount - 6) * 0.15;
-            const speed = 200 + this.phase * 50;
-            const startX = this.x + (this.facingRight ? this.width : 0);
-            const startY = this.y + this.height / 2;
-            const vx = Math.cos(angleOffset) * speed * (this.facingRight ? 1 : -1);
-            const vy = Math.sin(angleOffset) * speed;
-
-            const proj = new Projectile(startX, startY, vx, vy, false);
-            proj.damage = 15 * getDifficulty().enemyDamageMultiplier;
-            projectiles.push(proj);
-            this.burstCount--;
-            this.burstDelay = 0.1;
-            if (soundSystem) soundSystem.playTone(150, 0.05, 'square', 0.2);
-        }
-
-        if (this.attackTimer >= this.attackDuration) {
-            this.attackPattern = 'idle';
-            this.patternCooldown = 1.5;
-        }
-    }
-
-    executeCharge(dt, player) {
-        this.attackTimer += dt;
-
-        if (!this.isCharging && this.attackTimer < 0.5) {
-            this.shakeIntensity = 5;
-            this.velocityX = 0;
-        } else if (!this.isCharging) {
-            this.isCharging = true;
-            this.chargeTarget = { x: player.x, y: player.y };
-            if (soundSystem) soundSystem.playTone(80, 0.3, 'sawtooth', 0.4);
-        } else {
-            const dx = this.chargeTarget.x - this.x;
-            this.velocityX = Math.sign(dx) * this.chargeSpeed * getDifficulty().enemySpeedMultiplier;
-
-            if (Math.abs(dx) < 20) {
-                this.attackPattern = 'idle';
-                this.patternCooldown = 2.0;
-                this.isCharging = false;
-                if (screenShake) screenShake.shake(8, 0.2);
+        this.hoverTime += dt;
+        this.updateAI(dt, player, projectiles);
+        this.updateVisuals(dt);
+        
+        // Update invulnerability
+        if (this.invulnerable) {
+            this.invulnerableTimer -= dt;
+            if (this.invulnerableTimer <= 0) {
+                this.invulnerable = false;
             }
         }
 
-        if (this.attackTimer >= this.attackDuration) {
-            this.attackPattern = 'idle';
-            this.patternCooldown = 1.5;
-            this.isCharging = false;
+        // Update minions
+        this.minions = this.minions.filter(m => !m.isDead);
+
+        // Apply movement
+        this.x += this.velocityX * dt;
+        this.y += this.velocityY * dt;
+
+        // Hover animation when in air
+        if (!this.isGrounded) {
+            this.y = this.baseY + Math.sin(this.hoverTime * 2) * 8;
+        }
+
+        // Decay velocity
+        this.velocityX *= 0.9;
+        this.velocityY *= 0.9;
+    }
+
+    updateAI(dt, player, projectiles) {
+        if (player.isDead) return;
+
+        // Check phase transitions
+        const healthPercent = this.health / this.maxHealth;
+        if (healthPercent <= this.phaseThresholds[1] && this.phase < 3) {
+            this.transitionToPhase(3);
+        } else if (healthPercent <= this.phaseThresholds[0] && this.phase < 2) {
+            this.transitionToPhase(2);
+        }
+
+        // Update timers
+        this.attackTimer += dt;
+        this.attackCooldown -= dt;
+        this.teleportCooldown -= dt;
+
+        // Face player
+        this.facingRight = player.x > this.x;
+
+        // Execute current attack pattern
+        switch (this.attackPattern) {
+            case 'idle':
+                this.executeIdle(dt, player);
+                break;
+            case 'fireball_barrage':
+                this.executeFireballBarrage(dt, player, projectiles);
+                break;
+            case 'spiral_shot':
+                this.executeSpiralShot(dt, player, projectiles);
+                break;
+            case 'ground_pound':
+                this.executeGroundPound(dt, player, projectiles);
+                break;
+            case 'laser_sweep':
+                this.executeLaserSweep(dt, player, projectiles);
+                break;
+            case 'teleport_strike':
+                this.executeTeleportStrike(dt, player);
+                break;
+            case 'summon_minions':
+                this.executeSummonMinions(dt, player);
+                break;
+            case 'shockwave':
+                this.executeShockwave(dt, player, projectiles);
+                break;
+        }
+
+        // Choose new attack when ready
+        if (this.attackPattern === 'idle' && this.attackCooldown <= 0) {
+            this.chooseAttack(player);
         }
     }
 
-    executeBarrage(dt, player, projectiles) {
-        this.attackTimer += dt;
-        this.facePlayer(player);
-        this.velocityX = 0;
+    transitionToPhase(newPhase) {
+        this.phase = newPhase;
+        this.invulnerable = true;
+        this.invulnerableTimer = 1.2;
+        this.phaseTransitionTimer = 1.2;
+        this.attackPattern = 'idle';
+        this.attackCooldown = 0.5;
+        
+        if (screenShake) screenShake.shake(20, 0.8);
+        if (soundSystem) {
+            soundSystem.playTone(40, 0.8, 'sawtooth', 0.6);
+            setTimeout(() => soundSystem.playTone(80, 0.5, 'sawtooth', 0.5), 300);
+        }
+        
+        if (particleSystem) {
+            for (let i = 0; i < 50; i++) {
+                particleSystem.emit(
+                    this.x + this.width / 2,
+                    this.y + this.height / 2,
+                    1,
+                    {
+                        color: this.phase === 3 ? '#ff0000' : '#ff6600',
+                        minSpeed: 100,
+                        maxSpeed: 300,
+                        lifetime: 1.5
+                    }
+                );
+            }
+        }
 
-        if (this.burstCount > 0 && this.burstDelay <= 0) {
+        // Increase speed with each phase
+        if (this.phase === 2) {
+            this.moveSpeed = 220;
+        } else if (this.phase === 3 && !this.enrageActivated) {
+            this.enrageActivated = true;
+            this.moveSpeed = 280;
+            this.damage *= 1.5;
+        }
+    }
+
+    chooseAttack(player) {
+        let attacks = [];
+        
+        // Each phase has its own attack set
+        if (this.phase === 1) {
+            attacks = ['fireball_barrage', 'ground_pound', 'spiral_shot'];
+        } else if (this.phase === 2) {
+            attacks = ['fireball_barrage', 'spiral_shot', 'laser_sweep', 'teleport_strike', 'ground_pound'];
+        } else if (this.phase === 3) {
+            attacks = ['fireball_barrage', 'spiral_shot', 'laser_sweep', 'teleport_strike', 'summon_minions', 'shockwave', 'ground_pound'];
+        }
+
+        // Prevent repeating same attack
+        let newAttack;
+        do {
+            newAttack = attacks[Math.floor(Math.random() * attacks.length)];
+        } while (newAttack === this.lastAttack && attacks.length > 1);
+        
+        this.lastAttack = newAttack;
+        this.attackPattern = newAttack;
+        this.attackTimer = 0;
+        this.attackSubTimer = 0;
+    }
+
+    executeIdle(dt, player) {
+        // Slowly move towards center of arena
+        const centerX = CANVAS_WIDTH / 2;
+        const dx = centerX - this.x;
+        
+        if (Math.abs(dx) > 50) {
+            this.velocityX = Math.sign(dx) * this.moveSpeed * 0.5;
+        }
+    }
+
+    executeFireballBarrage(dt, player, projectiles) {
+        if (this.attackTimer === 0) {
+            this.fireballCount = this.phase === 3 ? 12 : this.phase === 2 ? 8 : 5;
+            this.velocityX = 0;
+        }
+
+        if (this.fireballCount > 0 && this.attackSubTimer <= 0) {
+            const startX = this.x + this.width / 2;
+            const startY = this.y + 30;
+            const dx = player.x - startX;
+            const dy = player.y - startY;
+            const angle = Math.atan2(dy, dx);
+            const spread = (Math.random() - 0.5) * 0.4;
+            const speed = 300 + Math.random() * 100;
+
+            const proj = new Projectile(
+                startX,
+                startY,
+                Math.cos(angle + spread) * speed,
+                Math.sin(angle + spread) * speed,
+                false
+            );
+            proj.damage = 20 * getDifficulty().enemyDamageMultiplier;
+            proj.color = '#ff4400';
+            projectiles.push(proj);
+
+            this.fireballCount--;
+            this.attackSubTimer = this.phase === 3 ? 0.15 : 0.25;
+            
+            if (soundSystem) soundSystem.playTone(250, 0.05, 'square', 0.2);
+            this.shakeIntensity = 3;
+        }
+
+        this.attackSubTimer -= dt;
+
+        if (this.fireballCount <= 0 && this.attackSubTimer <= -0.5) {
+            this.attackPattern = 'idle';
+            this.attackCooldown = 0.8;
+        }
+    }
+
+    executeSpiralShot(dt, player, projectiles) {
+        if (this.attackTimer === 0) {
+            this.spiralAngle = 0;
+            this.waveCount = this.phase === 3 ? 30 : 20;
+            this.velocityX = 0;
+        }
+
+        if (this.waveCount > 0 && this.attackSubTimer <= 0) {
             const startX = this.x + this.width / 2;
             const startY = this.y + this.height / 2;
-            const dx = (player.x + player.width / 2) - startX;
-            const dy = (player.y + player.height / 2) - startY;
-            const speed = 250;
-            const spread = (Math.random() - 0.5) * 0.5;
-            const angle = Math.atan2(dy, dx) + spread;
+            
+            // Shoot 3 projectiles in spiral pattern
+            for (let i = 0; i < 3; i++) {
+                const angle = this.spiralAngle + (i * Math.PI * 2 / 3);
+                const speed = 200;
 
-            const proj = new Projectile(startX, startY, Math.cos(angle) * speed, Math.sin(angle) * speed, false);
-            proj.damage = 10 * getDifficulty().enemyDamageMultiplier;
-            projectiles.push(proj);
-            this.burstCount--;
-            this.burstDelay = 0.15;
-            if (soundSystem) soundSystem.playTone(200, 0.03, 'square', 0.15);
+                const proj = new Projectile(
+                    startX,
+                    startY,
+                    Math.cos(angle) * speed,
+                    Math.sin(angle) * speed,
+                    false
+                );
+                proj.damage = 15 * getDifficulty().enemyDamageMultiplier;
+                proj.color = '#ff00ff';
+                projectiles.push(proj);
+            }
+
+            this.spiralAngle += 0.3;
+            this.waveCount--;
+            this.attackSubTimer = 0.08;
+            
+            if (soundSystem) soundSystem.playTone(350 + Math.sin(this.spiralAngle) * 50, 0.03, 'sine', 0.15);
         }
 
-        if (this.attackTimer >= this.attackDuration) {
+        this.attackSubTimer -= dt;
+
+        if (this.waveCount <= 0) {
             this.attackPattern = 'idle';
-            this.patternCooldown = 2.0;
+            this.attackCooldown = 1.0;
         }
     }
 
-    applyGravity(dt) {}
+    executeGroundPound(dt, player, projectiles) {
+        if (this.attackTimer === 0) {
+            this.isGrounded = false;
+            this.targetY = this.baseY - 100;
+            this.groundPoundActive = false;
+        }
 
-    moveY(amount, tileMap) {
-        this.y = this.baseY + this.hoverOffset;
+        // Rise up
+        if (!this.groundPoundActive && this.attackTimer < 1.0) {
+            this.y = this.baseY - (this.attackTimer / 1.0) * 100;
+            this.shakeIntensity = 5;
+        }
+        // Slam down
+        else if (!this.groundPoundActive && this.attackTimer >= 1.0) {
+            this.velocityY = 800;
+            this.groundPoundActive = true;
+            if (soundSystem) soundSystem.playTone(60, 0.3, 'sawtooth', 0.4);
+        }
+
+        // Impact
+        if (this.groundPoundActive && this.y >= this.baseY) {
+            this.y = this.baseY;
+            this.isGrounded = true;
+            
+            if (screenShake) screenShake.shake(15, 0.4);
+            if (soundSystem) soundSystem.playTone(30, 0.5, 'sawtooth', 0.5);
+            
+            // Create shockwave projectiles
+            const numWaves = this.phase === 3 ? 8 : 6;
+            for (let i = 0; i < numWaves; i++) {
+                const angle = (i / numWaves) * Math.PI * 2;
+                const speed = 200;
+                const proj = new Projectile(
+                    this.x + this.width / 2,
+                    this.y + this.height,
+                    Math.cos(angle) * speed,
+                    Math.sin(angle) * speed,
+                    false
+                );
+                proj.damage = 25 * getDifficulty().enemyDamageMultiplier;
+                proj.color = '#ffaa00';
+                projectiles.push(proj);
+            }
+            
+            if (particleSystem) {
+                particleSystem.emitExplosion(this.x + this.width / 2, this.y + this.height, '#aa6600');
+            }
+
+            this.attackPattern = 'idle';
+            this.attackCooldown = 1.2;
+        }
+    }
+
+    executeLaserSweep(dt, player, projectiles) {
+        if (this.attackTimer === 0) {
+            this.laserChargeTime = 0;
+            this.laserActive = false;
+            this.laserAngle = player.y < this.y ? -0.3 : 0.3;
+            this.velocityX = 0;
+        }
+
+        // Charge up
+        if (this.attackTimer < 1.5) {
+            this.laserChargeTime += dt;
+            this.eyeGlow = 2 + Math.sin(this.laserChargeTime * 20) * 0.5;
+            if (this.attackTimer > 1.0 && soundSystem && !this.laserActive) {
+                soundSystem.playTone(800, 0.5, 'sine', 0.3);
+            }
+        }
+        // Fire laser
+        else if (!this.laserActive) {
+            this.laserActive = true;
+            if (soundSystem) soundSystem.playTone(1200, 1.0, 'sine', 0.4);
+        }
+
+        // Sweep laser
+        if (this.laserActive && this.attackTimer < 3.0) {
+            const sweepProgress = (this.attackTimer - 1.5) / 1.5;
+            this.laserAngle = -0.5 + sweepProgress * 1.0;
+
+            // Spawn laser projectiles
+            if (this.attackSubTimer <= 0) {
+                const startX = this.x + (this.facingRight ? this.width : 0);
+                const startY = this.y + 30;
+                const speed = 600;
+
+                const proj = new Projectile(
+                    startX,
+                    startY,
+                    Math.cos(this.laserAngle) * speed * (this.facingRight ? 1 : -1),
+                    Math.sin(this.laserAngle) * speed,
+                    false
+                );
+                proj.damage = 18 * getDifficulty().enemyDamageMultiplier;
+                proj.color = '#00ffff';
+                proj.width = 8;
+                proj.height = 8;
+                projectiles.push(proj);
+
+                this.attackSubTimer = 0.05;
+            }
+            this.attackSubTimer -= dt;
+        }
+
+        if (this.attackTimer >= 3.0) {
+            this.laserActive = false;
+            this.attackPattern = 'idle';
+            this.attackCooldown = 1.5;
+        }
+    }
+
+    executeTeleportStrike(dt, player) {
+        if (this.attackTimer === 0) {
+            // Fade out
+            if (particleSystem) {
+                for (let i = 0; i < 30; i++) {
+                    particleSystem.emit(this.x + this.width / 2, this.y + this.height / 2, 1, {
+                        color: '#aa00ff',
+                        minSpeed: 50,
+                        maxSpeed: 150,
+                        lifetime: 0.8
+                    });
+                }
+            }
+            if (soundSystem) soundSystem.playTone(400, 0.3, 'sine', 0.3);
+        }
+
+        if (this.attackTimer > 0.5 && this.attackTimer < 0.51) {
+            // Teleport behind player
+            this.x = player.x + (player.facingRight ? -150 : 150);
+            this.y = player.y - 20;
+            this.facingRight = player.x > this.x;
+            
+            if (particleSystem) {
+                for (let i = 0; i < 30; i++) {
+                    particleSystem.emit(this.x + this.width / 2, this.y + this.height / 2, 1, {
+                        color: '#aa00ff',
+                        minSpeed: 50,
+                        maxSpeed: 150,
+                        lifetime: 0.8
+                    });
+                }
+            }
+            if (soundSystem) soundSystem.playTone(600, 0.3, 'sine', 0.3);
+        }
+
+        if (this.attackTimer > 1.0) {
+            this.attackPattern = 'idle';
+            this.attackCooldown = 0.8;
+            this.teleportCooldown = 4.0;
+        }
+    }
+
+    executeSummonMinions(dt, player) {
+        if (this.attackTimer === 0) {
+            this.summonCount = 3;
+            this.velocityX = 0;
+        }
+
+        if (this.summonCount > 0 && this.attackSubTimer <= 0) {
+            // Spawn a minion - it will be added to enemies array externally
+            const offsetX = (Math.random() - 0.5) * 200;
+            const minionX = this.x + offsetX;
+            const minionY = this.y;
+            
+            const minion = new GroundPatrolEnemy(minionX, minionY);
+            minion.health *= 0.5; // Half health
+            this.minions.push(minion);
+            
+            // Add to global enemies array if it exists
+            if (typeof enemies !== 'undefined') {
+                enemies.push(minion);
+            }
+
+            if (particleSystem) {
+                particleSystem.emitExplosion(minionX, minionY, '#ff00ff');
+            }
+            if (soundSystem) soundSystem.playTone(200, 0.2, 'square', 0.3);
+
+            this.summonCount--;
+            this.attackSubTimer = 0.8;
+        }
+
+        this.attackSubTimer -= dt;
+
+        if (this.summonCount <= 0 && this.attackSubTimer <= -0.5) {
+            this.attackPattern = 'idle';
+            this.attackCooldown = 2.0;
+        }
+    }
+
+    executeShockwave(dt, player, projectiles) {
+        if (this.attackTimer === 0) {
+            this.shockwaveRadius = 0;
+            if (soundSystem) soundSystem.playTone(100, 1.0, 'sawtooth', 0.5);
+        }
+
+        this.shockwaveRadius += 400 * dt;
+
+        // Spawn ring of projectiles
+        if (this.attackSubTimer <= 0) {
+            const numProj = 16;
+            for (let i = 0; i < numProj; i++) {
+                const angle = (i / numProj) * Math.PI * 2;
+                const spawnX = this.x + this.width / 2 + Math.cos(angle) * this.shockwaveRadius;
+                const spawnY = this.y + this.height / 2 + Math.sin(angle) * this.shockwaveRadius;
+                
+                const proj = new Projectile(
+                    spawnX,
+                    spawnY,
+                    Math.cos(angle) * 150,
+                    Math.sin(angle) * 150,
+                    false
+                );
+                proj.damage = 12 * getDifficulty().enemyDamageMultiplier;
+                proj.color = '#ff0000';
+                projectiles.push(proj);
+            }
+            this.attackSubTimer = 0.3;
+        }
+
+        this.attackSubTimer -= dt;
+
+        if (this.attackTimer >= 1.5) {
+            this.shockwaveRadius = 0;
+            this.attackPattern = 'idle';
+            this.attackCooldown = 1.5;
+        }
+    }
+
+    updateVisuals(dt) {
+        this.eyeGlow = 1 + Math.sin(Date.now() / 300) * 0.3;
+        this.shakeIntensity = Math.max(0, this.shakeIntensity - dt * 10);
+        
+        if (this.phaseTransitionTimer > 0) {
+            this.phaseTransitionTimer -= dt;
+        }
+
+        if (this.invulnerable) {
+            this.auraSize = 20 + Math.sin(Date.now() / 100) * 5;
+        } else {
+            this.auraSize = 0;
+        }
+
+        // Update crack progression based on health
+        this.crackProgress = 1 - (this.health / this.maxHealth);
+    }
+
+    takeDamage(amount, particleSystem) {
+        if (this.invulnerable || this.isDead) return;
+
+        super.takeDamage(amount, particleSystem);
+        this.shakeIntensity = 8;
+        this.lastDamageTaken = amount;
+    }
+
+    applyGravity(dt) {
+        // Boss doesn't use normal gravity
+    }
+
+    render(ctx, camera) {
+        if (this.isDead && this.deathTimer <= 0) return;
+
+        const screenPos = camera.worldToScreen(this.x, this.y);
+
+        ctx.save();
+
+        // Death fade
+        if (this.isDead) {
+            ctx.globalAlpha = this.deathTimer / this.deathDuration;
+        }
+
+        // Damage flash
+        if (this.damageFlash > 0) {
+            ctx.filter = 'brightness(2)';
+        }
+
+        const centerX = screenPos.x + this.width / 2;
+        const bottomY = screenPos.y + this.height;
+
+        ctx.translate(centerX, bottomY);
+        ctx.scale(this.facingRight ? 1 : -1, 1);
+        ctx.translate(-this.width / 2, -this.height);
+
+        this.drawEnemy(ctx);
+
+        ctx.restore();
+
+        // Boss health bar (always show)
+        this.drawHealthBar(ctx, screenPos);
     }
 
     drawEnemy(ctx) {
@@ -5022,99 +5467,202 @@ class BossEnemy extends Enemy {
         const h = this.height;
 
         ctx.save();
+        
+        // Apply shake effect
         if (this.shakeIntensity > 0) {
-            ctx.translate((Math.random() - 0.5) * this.shakeIntensity, (Math.random() - 0.5) * this.shakeIntensity);
+            ctx.translate(
+                (Math.random() - 0.5) * this.shakeIntensity,
+                (Math.random() - 0.5) * this.shakeIntensity
+            );
         }
 
-        // Body
-        const bodyGradient = ctx.createLinearGradient(0, 0, w, h);
-        bodyGradient.addColorStop(0, '#4a1a1a');
-        bodyGradient.addColorStop(0.5, '#8a2a2a');
-        bodyGradient.addColorStop(1, '#4a1a1a');
-        ctx.fillStyle = bodyGradient;
-        ctx.fillRect(10, 20, w - 20, h - 30);
+        // Invulnerability aura
+        if (this.auraSize > 0) {
+            ctx.strokeStyle = this.phase === 3 ? '#ff0000' : '#ffaa00';
+            ctx.lineWidth = 4;
+            ctx.globalAlpha = 0.6;
+            ctx.strokeRect(-this.auraSize / 2, -this.auraSize / 2, w + this.auraSize, h + this.auraSize);
+            ctx.globalAlpha = 1;
+        }
 
-        // Armor
-        ctx.fillStyle = '#3a1515';
-        ctx.fillRect(5, 30, 15, h - 50);
-        ctx.fillRect(w - 20, 30, 15, h - 50);
+        // Main body
+        const bodyColor = this.phase === 3 ? '#660000' : this.phase === 2 ? '#663300' : '#4a1a1a';
+        const highlightColor = this.phase === 3 ? '#aa0000' : this.phase === 2 ? '#aa5500' : '#8a2a2a';
+        
+        const bodyGrad = ctx.createLinearGradient(0, 0, w, h);
+        bodyGrad.addColorStop(0, bodyColor);
+        bodyGrad.addColorStop(0.5, highlightColor);
+        bodyGrad.addColorStop(1, bodyColor);
+        ctx.fillStyle = bodyGrad;
+        
+        // Torso
+        ctx.fillRect(w * 0.2, h * 0.25, w * 0.6, h * 0.6);
+
+        // Shoulders
+        ctx.fillStyle = '#2a0a0a';
+        ctx.fillRect(0, h * 0.25, w * 0.25, h * 0.3);
+        ctx.fillRect(w * 0.75, h * 0.25, w * 0.25, h * 0.3);
+
+        // Spikes on shoulders
+        ctx.fillStyle = '#1a0505';
+        for (let i = 0; i < 3; i++) {
+            const spikeY = h * 0.25 + i * 10;
+            ctx.beginPath();
+            ctx.moveTo(0, spikeY);
+            ctx.lineTo(-8, spikeY + 5);
+            ctx.lineTo(0, spikeY + 10);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(w, spikeY);
+            ctx.lineTo(w + 8, spikeY + 5);
+            ctx.lineTo(w, spikeY + 10);
+            ctx.fill();
+        }
+
+        // Legs
+        ctx.fillStyle = bodyColor;
+        ctx.fillRect(w * 0.25, h * 0.75, w * 0.2, h * 0.25);
+        ctx.fillRect(w * 0.55, h * 0.75, w * 0.2, h * 0.25);
 
         // Head
-        ctx.fillStyle = '#5a2020';
-        ctx.fillRect(15, 0, w - 30, 30);
+        ctx.fillStyle = highlightColor;
+        ctx.fillRect(w * 0.25, h * 0.05, w * 0.5, h * 0.25);
 
-        // Horns
-        ctx.fillStyle = '#2a0a0a';
+        // Horns (get bigger in phase 3)
+        const hornSize = this.phase === 3 ? 30 : 20;
+        ctx.fillStyle = '#1a0000';
         ctx.beginPath();
-        ctx.moveTo(10, 20);
-        ctx.lineTo(0, 0);
-        ctx.lineTo(20, 15);
+        ctx.moveTo(w * 0.2, h * 0.15);
+        ctx.lineTo(w * 0.1, h * 0.05 - hornSize);
+        ctx.lineTo(w * 0.25, h * 0.1);
         ctx.fill();
         ctx.beginPath();
-        ctx.moveTo(w - 10, 20);
-        ctx.lineTo(w, 0);
-        ctx.lineTo(w - 20, 15);
+        ctx.moveTo(w * 0.8, h * 0.15);
+        ctx.lineTo(w * 0.9, h * 0.05 - hornSize);
+        ctx.lineTo(w * 0.75, h * 0.1);
         ctx.fill();
 
-        // Eyes
+        // Eyes (glowing based on phase)
         const eyeColor = this.phase === 3 ? '#ff0000' : this.phase === 2 ? '#ff6600' : '#ffaa00';
         ctx.shadowColor = eyeColor;
-        ctx.shadowBlur = 15 * this.eyeGlow;
+        ctx.shadowBlur = 20 * this.eyeGlow;
         ctx.fillStyle = eyeColor;
-        ctx.fillRect(25, 8, 12, 8);
-        ctx.fillRect(w - 37, 8, 12, 8);
+        
+        const eyeWidth = 16;
+        const eyeHeight = this.laserActive ? 4 : 10;
+        ctx.fillRect(w * 0.3, h * 0.12, eyeWidth, eyeHeight);
+        ctx.fillRect(w * 0.7 - eyeWidth, h * 0.12, eyeWidth, eyeHeight);
         ctx.shadowBlur = 0;
 
-        // Mouth
-        ctx.fillStyle = '#1a0505';
-        ctx.fillRect(25, 20, w - 50, 8);
-        ctx.fillStyle = '#ccbbbb';
-        for (let i = 0; i < 5; i++) {
-            ctx.fillRect(30 + i * 10, 20, 4, 6);
+        // Mouth/teeth
+        ctx.fillStyle = '#0a0000';
+        ctx.fillRect(w * 0.35, h * 0.22, w * 0.3, h * 0.06);
+        ctx.fillStyle = '#ffffff';
+        for (let i = 0; i < 6; i++) {
+            ctx.fillRect(w * 0.37 + i * 6, h * 0.22, 3, 5);
         }
 
-        // Damage cracks
-        if (this.phase >= 2) {
+        // Chest core (pulses with attacks)
+        const coreSize = 12 + (this.attackPattern !== 'idle' ? Math.sin(Date.now() / 100) * 4 : 0);
+        ctx.fillStyle = eyeColor;
+        ctx.shadowBlur = 15;
+        ctx.beginPath();
+        ctx.arc(w / 2, h * 0.45, coreSize, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Battle damage cracks
+        if (this.crackProgress > 0.3) {
             ctx.strokeStyle = '#ff4400';
             ctx.lineWidth = 2;
             ctx.beginPath();
-            ctx.moveTo(w / 2, 30);
-            ctx.lineTo(w / 2 - 10, 50);
-            ctx.lineTo(w / 2 + 5, 70);
+            ctx.moveTo(w * 0.5, h * 0.3);
+            ctx.lineTo(w * 0.4, h * 0.5);
+            ctx.lineTo(w * 0.5, h * 0.7);
             ctx.stroke();
         }
-        if (this.phase >= 3) {
+        if (this.crackProgress > 0.6) {
             ctx.beginPath();
-            ctx.moveTo(w / 4, 40);
-            ctx.lineTo(w / 4 + 10, 60);
+            ctx.moveTo(w * 0.3, h * 0.4);
+            ctx.lineTo(w * 0.2, h * 0.6);
             ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(w * 0.7, h * 0.4);
+            ctx.lineTo(w * 0.8, h * 0.6);
+            ctx.stroke();
+        }
+
+        // Phase transition effect
+        if (this.phaseTransitionTimer > 0) {
+            ctx.globalAlpha = this.phaseTransitionTimer / 1.5;
+            ctx.fillStyle = this.phase === 3 ? '#ff0000' : '#ff6600';
+            ctx.fillRect(0, 0, w, h);
+            ctx.globalAlpha = 1;
+        }
+
+        // Draw shockwave ring if active
+        if (this.shockwaveRadius > 0) {
+            ctx.strokeStyle = '#ff0000';
+            ctx.lineWidth = 4;
+            ctx.globalAlpha = 0.7;
+            ctx.beginPath();
+            ctx.arc(w / 2, h / 2, this.shockwaveRadius, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.globalAlpha = 1;
         }
 
         ctx.restore();
     }
 
     drawHealthBar(ctx, screenPos) {
-        const barWidth = 200;
-        const barHeight = 16;
+        const barWidth = 400;
+        const barHeight = 20;
         const x = (CANVAS_WIDTH - barWidth) / 2;
-        const y = 100;
+        const y = 80;
 
-        ctx.fillStyle = '#330000';
+        // Background
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        ctx.fillRect(x - 5, y - 5, barWidth + 10, barHeight + 10);
+
+        // Health bar background
+        ctx.fillStyle = '#2a0000';
         ctx.fillRect(x, y, barWidth, barHeight);
 
-        const healthPercent = this.health / this.maxHealth;
-        const color = this.phase === 3 ? '#ff0000' : this.phase === 2 ? '#ff6600' : '#ffaa00';
-        ctx.fillStyle = color;
+        // Health bar fill
+        const healthPercent = Math.max(0, this.health / this.maxHealth);
+        const barColor = this.phase === 3 ? '#ff0000' : this.phase === 2 ? '#ff6600' : '#00ff00';
+        ctx.fillStyle = barColor;
         ctx.fillRect(x + 2, y + 2, (barWidth - 4) * healthPercent, barHeight - 4);
 
-        ctx.strokeStyle = '#880000';
+        // Phase markers
+        ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x + barWidth * 0.66, y);
+        ctx.lineTo(x + barWidth * 0.66, y + barHeight);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x + barWidth * 0.33, y);
+        ctx.lineTo(x + barWidth * 0.33, y + barHeight);
+        ctx.stroke();
+
+        // Border
+        ctx.strokeStyle = '#8b0000';
+        ctx.lineWidth = 3;
         ctx.strokeRect(x, y, barWidth, barHeight);
 
-        ctx.font = 'bold 12px Impact, Arial Black, sans-serif';
-        ctx.fillStyle = '#ff4444';
+        // Boss name
+        ctx.font = 'bold 18px Impact';
+        ctx.fillStyle = this.phase === 3 ? '#ff0000' : '#ffaa00';
         ctx.textAlign = 'center';
-        ctx.fillText('DEMON LORD', CANVAS_WIDTH / 2, y + barHeight + 14);
+        ctx.fillText('THE CYBERDEMON LORD', CANVAS_WIDTH / 2, y - 10);
+
+        // Phase indicator
+        ctx.font = 'bold 14px Impact';
+        ctx.fillStyle = '#ffffff';
+        const phaseText = this.phase === 3 ? 'ENRAGED' : this.phase === 2 ? 'DAMAGED' : 'PHASE 1';
+        ctx.fillText(phaseText, CANVAS_WIDTH / 2, y + barHeight + 20);
     }
 }
 
@@ -5209,6 +5757,8 @@ class LevelManager {
 
         // Reset player position
         if (player) {
+            // Clear checkpoint when loading new level
+            player.clearCheckpoint();
             player.reset(
                 this.currentMap.playerStart.x * TILE_SIZE,
                 this.currentMap.playerStart.y * TILE_SIZE
