@@ -93,13 +93,13 @@ const SKIN_DEFINITIONS = [
     {
         id: 'classic',
         name: 'Classic Doomguy',
-        description: 'Standard green armor with visor',
+        description: 'Red armor, green visor',
         price: 0,
         rarity: 'common',
         colors: {
-            legs: '#152515', bodyDark: '#1a3a1a', bodyMid: '#2a5a2a',
-            chest: '#2a5a2a', armorHighlight: '#3a7a3a', belt: '#3a2a1a',
-            arms: '#1a3a1a', helmet: '#1a3a1a',
+            legs: '#251515', bodyDark: '#3a1a1a', bodyMid: '#5a2a2a',
+            chest: '#6a2a2a', armorHighlight: '#8a3a3a', belt: '#3a2a1a',
+            arms: '#3a1a1a', helmet: '#3a1a1a',
             visorGlow: '#00ff00', visorDefault: '#00aa00',
             visorJump: '#00ff88', visorFall: '#88ff00', visorWalk: '#00dd00',
             jetColor: 'rgba(255, 100, 0, 0.6)'
@@ -524,6 +524,7 @@ const ACHIEVEMENTS = {
     survivor: { id: 'survivor', name: 'Survivor', description: 'Complete a level without dying', icon: '🛡️' },
     speedrunner: { id: 'speedrunner', name: 'Speed Demon', description: 'Complete level 1 in under 60 seconds', icon: '⚡' },
     collector: { id: 'collector', name: 'Collector', description: 'Collect 20 pickups', icon: '📦' },
+    skinCollector: { id: 'skinCollector', name: 'Skin Collector', description: 'Own all character skins', icon: '👕' },
     bossSlayer: { id: 'bossSlayer', name: 'Boss Slayer', description: 'Defeat a boss', icon: '👹' },
     perfectionist: { id: 'perfectionist', name: 'Perfectionist', description: 'Complete a level with full health', icon: '❤️' },
     weaponMaster: { id: 'weaponMaster', name: 'Weapon Master', description: 'Unlock all weapons', icon: '🔫' },
@@ -929,6 +930,10 @@ class SkinManager {
         if (coinSystem && coinSystem.spend(skin.price)) {
             this.ownedSkins.push(id);
             this.save();
+            // Check for skin collector achievement
+            if (achievementSystem && this.ownedSkins.length === SKIN_DEFINITIONS.length) {
+                achievementSystem.unlock('skinCollector');
+            }
             return true;
         }
         return false;
@@ -5823,6 +5828,25 @@ function update(dt) {
         // Update particles
         particleSystem.update(dt);
     }
+
+    // Update coin system (always, even when paused)
+    if (coinSystem) {
+        coinSystem.update(dt);
+    }
+
+    // Update shop UI if open
+    if (gameState.showShop && shopUI) {
+        shopUI.handleInput(input);
+        shopUI.update(dt);
+    }
+
+    // Handle shop opening
+    if (input.shopOpen) {
+        input.shopOpen = false;
+        if (shopUI && !gameState.showShop) {
+            shopUI.open();
+        }
+    }
 }
 
 // AABB collision helper
@@ -5889,6 +5913,17 @@ function render() {
         drawGameOverMenu();
     } else if (gameState.paused && (!levelEditor || !levelEditor.active)) {
         drawPauseMenu();
+    }
+
+    // Render coin popups and notifications
+    if (coinSystem) {
+        coinSystem.renderPopups(ctx, camera);
+        coinSystem.renderNotification(ctx);
+    }
+
+    // Render shop UI
+    if (gameState.showShop && shopUI) {
+        shopUI.render(ctx);
     }
 
     // Render achievement notifications
