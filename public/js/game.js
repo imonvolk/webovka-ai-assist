@@ -3486,14 +3486,9 @@ class Player {
     }
 
     reset(x, y) {
-        // Use checkpoint if available
-        if (this.hasCheckpoint) {
-            this.x = this.checkpointX;
-            this.y = this.checkpointY;
-        } else {
-            this.x = x;
-            this.y = y;
-        }
+        // Set position to provided coordinates (which may be checkpoint or start)
+        this.x = x;
+        this.y = y;
         this.velocityX = 0;
         this.velocityY = 0;
         this.isGrounded = false;
@@ -3508,6 +3503,7 @@ class Player {
         if (this.ammo[this.currentWeapon] <= 0 && this.currentWeapon !== 'pistol') {
             this.currentWeapon = 'pistol';
         }
+        // Keep checkpoint on respawn - don't clear it
         this.stats.deaths++;
     }
 
@@ -3590,10 +3586,15 @@ class Player {
         if (this.isDead) {
             this.respawnTimer -= dt;
             if (this.respawnTimer <= 0) {
-                this.reset(
-                    tileMap.playerStart.x * TILE_SIZE,
-                    tileMap.playerStart.y * TILE_SIZE
-                );
+                // Respawn at checkpoint if available, otherwise at level start
+                if (this.hasCheckpoint) {
+                    this.reset(this.checkpointX, this.checkpointY);
+                } else {
+                    this.reset(
+                        tileMap.playerStart.x * TILE_SIZE,
+                        tileMap.playerStart.y * TILE_SIZE
+                    );
+                }
             }
             return;
         }
@@ -3887,8 +3888,8 @@ class Player {
             screenShake.shake(10, 0.3);
         }
 
-        // Trigger game over check
-        gameState.gameOver = true;
+        // Don't trigger game over - just respawn at checkpoint
+        // gameState.gameOver = true;
     }
 
     handleShooting(input, projectiles, particleSystem) {
@@ -4871,11 +4872,11 @@ class BossEnemy extends Enemy {
         super(x, y, 'boss');
         this.width = 96;
         this.height = 120;
-        this.health = 800 * getDifficulty().enemyHealthMultiplier;
+        this.health = 1000 * getDifficulty().enemyHealthMultiplier;
         this.maxHealth = this.health;
-        this.damage = 30 * getDifficulty().enemyDamageMultiplier;
+        this.damage = 40 * getDifficulty().enemyDamageMultiplier;
         this.detectionRange = 2000;
-        this.moveSpeed = 180;
+        this.moveSpeed = 240;
 
         // Boss phases (1=normal, 2=damaged, 3=enraged)
         this.phase = 1;
@@ -5044,10 +5045,10 @@ class BossEnemy extends Enemy {
 
         // Increase speed with each phase
         if (this.phase === 2) {
-            this.moveSpeed = 220;
+            this.moveSpeed = 280;
         } else if (this.phase === 3 && !this.enrageActivated) {
             this.enrageActivated = true;
-            this.moveSpeed = 280;
+            this.moveSpeed = 340;
             this.damage *= 1.5;
         }
     }
@@ -5088,7 +5089,7 @@ class BossEnemy extends Enemy {
 
     executeFireballBarrage(dt, player, projectiles) {
         if (this.attackTimer === 0) {
-            this.fireballCount = this.phase === 3 ? 12 : this.phase === 2 ? 8 : 5;
+            this.fireballCount = this.phase === 3 ? 16 : this.phase === 2 ? 10 : 6;
             this.velocityX = 0;
         }
 
@@ -5099,7 +5100,7 @@ class BossEnemy extends Enemy {
             const dy = player.y - startY;
             const angle = Math.atan2(dy, dx);
             const spread = (Math.random() - 0.5) * 0.4;
-            const speed = 300 + Math.random() * 100;
+            const speed = 350 + Math.random() * 150;
 
             const proj = new Projectile(
                 startX,
@@ -5108,12 +5109,12 @@ class BossEnemy extends Enemy {
                 Math.sin(angle + spread) * speed,
                 false
             );
-            proj.damage = 20 * getDifficulty().enemyDamageMultiplier;
+            proj.damage = 25 * getDifficulty().enemyDamageMultiplier;
             proj.color = '#ff4400';
             projectiles.push(proj);
 
             this.fireballCount--;
-            this.attackSubTimer = this.phase === 3 ? 0.15 : 0.25;
+            this.attackSubTimer = this.phase === 3 ? 0.1 : 0.18;
             
             if (soundSystem) soundSystem.playTone(250, 0.05, 'square', 0.2);
             this.shakeIntensity = 3;
@@ -5121,16 +5122,16 @@ class BossEnemy extends Enemy {
 
         this.attackSubTimer -= dt;
 
-        if (this.fireballCount <= 0 && this.attackSubTimer <= -0.5) {
+        if (this.fireballCount <= 0 && this.attackSubTimer <= -0.3) {
             this.attackPattern = 'idle';
-            this.attackCooldown = 0.8;
+            this.attackCooldown = 0.5;
         }
     }
 
     executeSpiralShot(dt, player, projectiles) {
         if (this.attackTimer === 0) {
             this.spiralAngle = 0;
-            this.waveCount = this.phase === 3 ? 30 : 20;
+            this.waveCount = this.phase === 3 ? 40 : 25;
             this.velocityX = 0;
         }
 
@@ -5141,7 +5142,7 @@ class BossEnemy extends Enemy {
             // Shoot 3 projectiles in spiral pattern
             for (let i = 0; i < 3; i++) {
                 const angle = this.spiralAngle + (i * Math.PI * 2 / 3);
-                const speed = 200;
+                const speed = 250;
 
                 const proj = new Projectile(
                     startX,
@@ -5150,14 +5151,14 @@ class BossEnemy extends Enemy {
                     Math.sin(angle) * speed,
                     false
                 );
-                proj.damage = 15 * getDifficulty().enemyDamageMultiplier;
+                proj.damage = 18 * getDifficulty().enemyDamageMultiplier;
                 proj.color = '#ff00ff';
                 projectiles.push(proj);
             }
 
-            this.spiralAngle += 0.3;
+            this.spiralAngle += 0.4;
             this.waveCount--;
-            this.attackSubTimer = 0.08;
+            this.attackSubTimer = 0.06;
             
             if (soundSystem) soundSystem.playTone(350 + Math.sin(this.spiralAngle) * 50, 0.03, 'sine', 0.15);
         }
@@ -5166,25 +5167,25 @@ class BossEnemy extends Enemy {
 
         if (this.waveCount <= 0) {
             this.attackPattern = 'idle';
-            this.attackCooldown = 1.0;
+            this.attackCooldown = 0.6;
         }
     }
 
     executeGroundPound(dt, player, projectiles) {
         if (this.attackTimer === 0) {
             this.isGrounded = false;
-            this.targetY = this.baseY - 100;
+            this.targetY = this.baseY - 120;
             this.groundPoundActive = false;
         }
 
-        // Rise up
-        if (!this.groundPoundActive && this.attackTimer < 1.0) {
-            this.y = this.baseY - (this.attackTimer / 1.0) * 100;
+        // Rise up faster
+        if (!this.groundPoundActive && this.attackTimer < 0.6) {
+            this.y = this.baseY - (this.attackTimer / 0.6) * 120;
             this.shakeIntensity = 5;
         }
         // Slam down
-        else if (!this.groundPoundActive && this.attackTimer >= 1.0) {
-            this.velocityY = 800;
+        else if (!this.groundPoundActive && this.attackTimer >= 0.6) {
+            this.velocityY = 1000;
             this.groundPoundActive = true;
             if (soundSystem) soundSystem.playTone(60, 0.3, 'sawtooth', 0.4);
         }
@@ -5194,14 +5195,14 @@ class BossEnemy extends Enemy {
             this.y = this.baseY;
             this.isGrounded = true;
             
-            if (screenShake) screenShake.shake(15, 0.4);
+            if (screenShake) screenShake.shake(18, 0.4);
             if (soundSystem) soundSystem.playTone(30, 0.5, 'sawtooth', 0.5);
             
-            // Create shockwave projectiles
-            const numWaves = this.phase === 3 ? 8 : 6;
+            // Create shockwave projectiles - more waves, faster speed
+            const numWaves = this.phase === 3 ? 12 : 8;
             for (let i = 0; i < numWaves; i++) {
                 const angle = (i / numWaves) * Math.PI * 2;
-                const speed = 200;
+                const speed = 250;
                 const proj = new Projectile(
                     this.x + this.width / 2,
                     this.y + this.height,
@@ -5209,7 +5210,7 @@ class BossEnemy extends Enemy {
                     Math.sin(angle) * speed,
                     false
                 );
-                proj.damage = 25 * getDifficulty().enemyDamageMultiplier;
+                proj.damage = 30 * getDifficulty().enemyDamageMultiplier;
                 proj.color = '#ffaa00';
                 projectiles.push(proj);
             }
@@ -5219,7 +5220,7 @@ class BossEnemy extends Enemy {
             }
 
             this.attackPattern = 'idle';
-            this.attackCooldown = 1.2;
+            this.attackCooldown = 0.7;
         }
     }
 
@@ -5245,16 +5246,16 @@ class BossEnemy extends Enemy {
             if (soundSystem) soundSystem.playTone(1200, 1.0, 'sine', 0.4);
         }
 
-        // Sweep laser
-        if (this.laserActive && this.attackTimer < 3.0) {
-            const sweepProgress = (this.attackTimer - 1.5) / 1.5;
-            this.laserAngle = -0.5 + sweepProgress * 1.0;
+        // Sweep laser - faster sweep
+        if (this.laserActive && this.attackTimer < 2.5) {
+            const sweepProgress = (this.attackTimer - 1.2) / 1.3;
+            this.laserAngle = -0.6 + sweepProgress * 1.2;
 
             // Spawn laser projectiles
             if (this.attackSubTimer <= 0) {
                 const startX = this.x + (this.facingRight ? this.width : 0);
                 const startY = this.y + 30;
-                const speed = 600;
+                const speed = 700;
 
                 const proj = new Projectile(
                     startX,
@@ -5263,21 +5264,21 @@ class BossEnemy extends Enemy {
                     Math.sin(this.laserAngle) * speed,
                     false
                 );
-                proj.damage = 18 * getDifficulty().enemyDamageMultiplier;
+                proj.damage = 22 * getDifficulty().enemyDamageMultiplier;
                 proj.color = '#00ffff';
-                proj.width = 8;
-                proj.height = 8;
+                proj.width = 10;
+                proj.height = 10;
                 projectiles.push(proj);
 
-                this.attackSubTimer = 0.05;
+                this.attackSubTimer = 0.04;
             }
             this.attackSubTimer -= dt;
         }
 
-        if (this.attackTimer >= 3.0) {
+        if (this.attackTimer >= 2.5) {
             this.laserActive = false;
             this.attackPattern = 'idle';
-            this.attackCooldown = 1.5;
+            this.attackCooldown = 0.8;
         }
     }
 
@@ -5297,8 +5298,8 @@ class BossEnemy extends Enemy {
             if (soundSystem) soundSystem.playTone(400, 0.3, 'sine', 0.3);
         }
 
-        if (this.attackTimer > 0.5 && this.attackTimer < 0.51) {
-            // Teleport behind player
+        if (this.attackTimer > 0.3 && this.attackTimer < 0.31) {
+            // Teleport behind player faster
             this.x = player.x + (player.facingRight ? -150 : 150);
             this.y = player.y - 20;
             this.facingRight = player.x > this.x;
@@ -5316,31 +5317,39 @@ class BossEnemy extends Enemy {
             if (soundSystem) soundSystem.playTone(600, 0.3, 'sine', 0.3);
         }
 
-        if (this.attackTimer > 1.0) {
+        if (this.attackTimer > 0.7) {
             this.attackPattern = 'idle';
-            this.attackCooldown = 0.8;
-            this.teleportCooldown = 4.0;
+            this.attackCooldown = 0.5;
+            this.teleportCooldown = 3.0;
         }
     }
 
     executeSummonMinions(dt, player) {
         if (this.attackTimer === 0) {
-            this.summonCount = 3;
+            this.summonCount = this.phase === 3 ? 5 : 4;
             this.velocityX = 0;
         }
 
         if (this.summonCount > 0 && this.attackSubTimer <= 0) {
-            // Spawn a minion - it will be added to enemies array externally
-            const offsetX = (Math.random() - 0.5) * 200;
+            // Spawn a minion
+            const offsetX = (Math.random() - 0.5) * 300;
             const minionX = this.x + offsetX;
             const minionY = this.y;
             
-            const minion = new GroundPatrolEnemy(minionX, minionY);
-            minion.health *= 0.5; // Half health
-            this.minions.push(minion);
+            // Create different enemy types randomly
+            const enemyTypes = ['patrol', 'shooter'];
+            const enemyType = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
             
-            // Add to global enemies array if it exists
-            if (typeof enemies !== 'undefined') {
+            let minion;
+            if (enemyType === 'shooter') {
+                minion = new StationaryShooterEnemy(minionX, minionY);
+            } else {
+                minion = new GroundPatrolEnemy(minionX, minionY);
+            }
+            minion.health *= 0.6; // Reduced health
+            
+            // Add to global enemies array
+            if (typeof enemies !== 'undefined' && enemies !== null) {
                 enemies.push(minion);
             }
 
@@ -5348,16 +5357,17 @@ class BossEnemy extends Enemy {
                 particleSystem.emitExplosion(minionX, minionY, '#ff00ff');
             }
             if (soundSystem) soundSystem.playTone(200, 0.2, 'square', 0.3);
+            if (screenShake) screenShake.shake(8, 0.2);
 
             this.summonCount--;
-            this.attackSubTimer = 0.8;
+            this.attackSubTimer = 0.5;
         }
 
         this.attackSubTimer -= dt;
 
-        if (this.summonCount <= 0 && this.attackSubTimer <= -0.5) {
+        if (this.summonCount <= 0 && this.attackSubTimer <= -0.3) {
             this.attackPattern = 'idle';
-            this.attackCooldown = 2.0;
+            this.attackCooldown = 1.2;
         }
     }
 
@@ -5367,11 +5377,11 @@ class BossEnemy extends Enemy {
             if (soundSystem) soundSystem.playTone(100, 1.0, 'sawtooth', 0.5);
         }
 
-        this.shockwaveRadius += 400 * dt;
+        this.shockwaveRadius += 500 * dt;
 
-        // Spawn ring of projectiles
+        // Spawn ring of projectiles - more projectiles, faster
         if (this.attackSubTimer <= 0) {
-            const numProj = 16;
+            const numProj = this.phase === 3 ? 24 : 20;
             for (let i = 0; i < numProj; i++) {
                 const angle = (i / numProj) * Math.PI * 2;
                 const spawnX = this.x + this.width / 2 + Math.cos(angle) * this.shockwaveRadius;
@@ -5380,23 +5390,23 @@ class BossEnemy extends Enemy {
                 const proj = new Projectile(
                     spawnX,
                     spawnY,
-                    Math.cos(angle) * 150,
-                    Math.sin(angle) * 150,
+                    Math.cos(angle) * 200,
+                    Math.sin(angle) * 200,
                     false
                 );
-                proj.damage = 12 * getDifficulty().enemyDamageMultiplier;
+                proj.damage = 16 * getDifficulty().enemyDamageMultiplier;
                 proj.color = '#ff0000';
                 projectiles.push(proj);
             }
-            this.attackSubTimer = 0.3;
+            this.attackSubTimer = 0.25;
         }
 
         this.attackSubTimer -= dt;
 
-        if (this.attackTimer >= 1.5) {
+        if (this.attackTimer >= 1.2) {
             this.shockwaveRadius = 0;
             this.attackPattern = 'idle';
-            this.attackCooldown = 1.5;
+            this.attackCooldown = 0.8;
         }
     }
 
