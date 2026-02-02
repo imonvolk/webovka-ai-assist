@@ -49,6 +49,7 @@ const gameState = {
     transitionAlpha: 0,
     score: 0,
     gameOver: false,
+    victory: false,
     showMenu: true,
     difficulty: 'normal', // 'easy', 'normal', 'hard'
     showSettings: false,
@@ -3943,9 +3944,9 @@ class Player {
                 
                 // Rocket jumping - if shooting down with rocket launcher
                 if (this.currentWeapon === 'rocket' && shootDir.y > 0.5) {
-                    // Apply upward velocity for rocket jump
-                    this.velocityY = -450;
-                    if (screenShake) screenShake.shake(10, 0.25);
+                    // Apply upward velocity for rocket jump - much stronger
+                    this.velocityY = -650;
+                    if (screenShake) screenShake.shake(15, 0.3);
                 }
             }
         }
@@ -5135,12 +5136,16 @@ class BossEnemy extends Enemy {
     }
 
     executeIdle(dt, player) {
-        // Slowly move towards center of arena
-        const centerX = CANVAS_WIDTH / 2;
-        const dx = centerX - this.x;
+        // Aggressively move towards player
+        const dx = player.x - this.x;
         
-        if (Math.abs(dx) > 50) {
-            this.velocityX = Math.sign(dx) * this.moveSpeed * 0.5;
+        if (Math.abs(dx) > 100) {
+            this.velocityX = Math.sign(dx) * this.moveSpeed * 0.8;
+        }
+        
+        // Much shorter idle time - boss is constantly attacking
+        if (this.attackTimer > 0.2) {
+            this.attackCooldown = 0;
         }
     }
 
@@ -5179,9 +5184,9 @@ class BossEnemy extends Enemy {
 
         this.attackSubTimer -= dt;
 
-        if (this.fireballCount <= 0 && this.attackSubTimer <= -0.3) {
+        if (this.fireballCount <= 0 && this.attackSubTimer <= -0.2) {
             this.attackPattern = 'idle';
-            this.attackCooldown = 0.5;
+            this.attackCooldown = 0.2;
         }
     }
 
@@ -5224,7 +5229,7 @@ class BossEnemy extends Enemy {
 
         if (this.waveCount <= 0) {
             this.attackPattern = 'idle';
-            this.attackCooldown = 0.6;
+            this.attackCooldown = 0.3;
         }
     }
 
@@ -5277,7 +5282,7 @@ class BossEnemy extends Enemy {
             }
 
             this.attackPattern = 'idle';
-            this.attackCooldown = 0.7;
+            this.attackCooldown = 0.4;
         }
     }
 
@@ -5335,7 +5340,7 @@ class BossEnemy extends Enemy {
         if (this.attackTimer >= 2.5) {
             this.laserActive = false;
             this.attackPattern = 'idle';
-            this.attackCooldown = 0.8;
+            this.attackCooldown = 0.4;
         }
     }
 
@@ -5376,8 +5381,8 @@ class BossEnemy extends Enemy {
 
         if (this.attackTimer > 0.7) {
             this.attackPattern = 'idle';
-            this.attackCooldown = 0.5;
-            this.teleportCooldown = 3.0;
+            this.attackCooldown = 0.3;
+            this.teleportCooldown = 2.0;
         }
     }
 
@@ -5424,7 +5429,7 @@ class BossEnemy extends Enemy {
 
         if (this.summonCount <= 0 && this.attackSubTimer <= -0.3) {
             this.attackPattern = 'idle';
-            this.attackCooldown = 1.2;
+            this.attackCooldown = 0.8;
         }
     }
 
@@ -5463,7 +5468,7 @@ class BossEnemy extends Enemy {
         if (this.attackTimer >= 1.2) {
             this.shockwaveRadius = 0;
             this.attackPattern = 'idle';
-            this.attackCooldown = 0.8;
+            this.attackCooldown = 0.4;
         }
     }
 
@@ -6287,6 +6292,67 @@ function drawGameOverMenu() {
     ctx.globalAlpha = 1;
 }
 
+function drawVictoryScreen() {
+    // Bright overlay with gradient
+    const gradient = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT);
+    gradient.addColorStop(0, 'rgba(139, 0, 0, 0.9)');
+    gradient.addColorStop(1, 'rgba(0, 0, 0, 0.9)');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+    // Victory text with glow
+    const pulse = Math.sin(Date.now() / 200) * 0.3 + 0.7;
+    ctx.shadowColor = '#ffaa00';
+    ctx.shadowBlur = 20 * pulse;
+    ctx.font = 'bold 56px Impact, Arial Black, sans-serif';
+    ctx.fillStyle = '#ffdd00';
+    ctx.textAlign = 'center';
+    ctx.fillText('VICTORY!', CANVAS_WIDTH / 2, 150);
+    ctx.shadowBlur = 0;
+
+    // Subtitle
+    ctx.font = 'bold 24px Impact, Arial Black, sans-serif';
+    ctx.fillStyle = '#ff6600';
+    ctx.fillText('THE CYBERDEMON HAS BEEN DEFEATED!', CANVAS_WIDTH / 2, 200);
+
+    // Final score with bonus
+    ctx.font = 'bold 28px Impact, Arial Black, sans-serif';
+    ctx.fillStyle = '#00ff00';
+    ctx.fillText(`FINAL SCORE: ${gameState.score}`, CANVAS_WIDTH / 2, 270);
+    
+    ctx.font = 'bold 18px Impact, Arial Black, sans-serif';
+    ctx.fillStyle = '#88ff88';
+    ctx.fillText('(+5000 Victory Bonus)', CANVAS_WIDTH / 2, 300);
+
+    // Stats
+    if (player) {
+        ctx.font = 'bold 16px Impact, Arial Black, sans-serif';
+        ctx.fillStyle = '#cccccc';
+        ctx.fillText(`Shots Fired: ${player.stats.shotsFired}`, CANVAS_WIDTH / 2, 350);
+        ctx.fillText(`Damage Taken: ${Math.floor(player.stats.damageTaken)}`, CANVAS_WIDTH / 2, 375);
+        ctx.fillText(`Levels Completed: 4`, CANVAS_WIDTH / 2, 400);
+    }
+
+    // High score check
+    const highScore = highScoreSystem ? highScoreSystem.getHighScore() : 0;
+    if (gameState.score >= highScore) {
+        ctx.font = 'bold 22px Impact, Arial Black, sans-serif';
+        ctx.fillStyle = '#ffff00';
+        ctx.shadowColor = '#ffff00';
+        ctx.shadowBlur = 15;
+        ctx.fillText('★ NEW HIGH SCORE! ★', CANVAS_WIDTH / 2, 450);
+        ctx.shadowBlur = 0;
+    }
+
+    // Play again prompt
+    ctx.font = 'bold 18px Impact, Arial Black, sans-serif';
+    ctx.fillStyle = '#00ff00';
+    const promptPulse = Math.sin(Date.now() / 300) * 0.3 + 0.7;
+    ctx.globalAlpha = promptPulse;
+    ctx.fillText('PRESS ENTER TO PLAY AGAIN', CANVAS_WIDTH / 2, 510);
+    ctx.globalAlpha = 1;
+}
+
 function update(dt) {
     // Handle pause toggle
     if (input.consumePause() && gameState.started && !gameState.showMenu && !gameState.gameOver) {
@@ -6336,6 +6402,16 @@ function update(dt) {
                     achievementSystem.onEnemyKilled(player);
                     if (enemy.type === 'boss') {
                         achievementSystem.onBossKilled();
+                        // Boss defeated - trigger victory!
+                        setTimeout(() => {
+                            gameState.victory = true;
+                            gameState.score += 5000; // Bonus for beating the game
+                            if (soundSystem) {
+                                soundSystem.playTone(523, 0.2, 'square', 0.4); // C
+                                setTimeout(() => soundSystem.playTone(659, 0.2, 'square', 0.4), 200); // E
+                                setTimeout(() => soundSystem.playTone(784, 0.3, 'square', 0.5), 400); // G
+                            }
+                        }, 2000);
                     }
                 }
             }
@@ -6526,6 +6602,8 @@ function render() {
     // Render menus
     if (gameState.showMenu) {
         drawStartMenu();
+    } else if (gameState.victory) {
+        drawVictoryScreen();
     } else if (gameState.gameOver) {
         drawGameOverMenu();
     } else if (gameState.paused && (!levelEditor || !levelEditor.active)) {
@@ -6567,6 +6645,11 @@ function gameLoop(timestamp) {
             startGame();
         }
         render();
+    } else if (gameState.victory) {
+        if (input.consumeEnter()) {
+            restartGame();
+        }
+        render();
     } else if (gameState.gameOver) {
         if (input.consumeEnter()) {
             restartGame();
@@ -6584,6 +6667,7 @@ function startGame() {
     gameState.showMenu = false;
     gameState.started = true;
     gameState.gameOver = false;
+    gameState.victory = false;
     gameState.score = 0;
 
     // Initialize audio on user interaction
