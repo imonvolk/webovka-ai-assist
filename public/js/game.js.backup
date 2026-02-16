@@ -6986,6 +6986,11 @@ function drawPauseMenu() {
     ctx.font = 'bold 14px Impact';
     ctx.fillStyle = '#ffdd00';
     ctx.fillText('Press B to open SKIN SHOP', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 130);
+    
+    // Return to menu button
+    ctx.font = 'bold 14px Impact';
+    ctx.fillStyle = '#ff5555';
+    ctx.fillText('Press M to return to MENU', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 155);
 }
 
 function drawGameOverMenu() {
@@ -7107,6 +7112,11 @@ function update(dt) {
         } else if (!gameState.paused && soundSystem) {
             soundSystem.startMusic();
         }
+    }
+    
+    // Handle return to menu (M key during pause)
+    if (gameState.paused && input.keys['KeyM'] && gameState.started) {
+        returnToMenu();
     }
 
     // Update screen shake
@@ -7421,6 +7431,24 @@ function gameLoop(timestamp) {
     }
 
     requestAnimationFrame(gameLoop);
+}
+
+function returnToMenu() {
+    gameState.showMenu = true;
+    gameState.started = false;
+    gameState.paused = false;
+    gameState.gameOver = false;
+    gameState.victory = false;
+    
+    // Stop music
+    if (soundSystem) {
+        soundSystem.stopMusic();
+    }
+    
+    // Reset player
+    if (player) {
+        player.fullReset();
+    }
 }
 
 function startGame() {

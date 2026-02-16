@@ -19,6 +19,42 @@
             <p>WASD or Arrow Keys to move | Space to jump</p>
         </footer>
     </div>
-    <script src="js/game.js"></script>
+    
+    <!-- Load modules in dependency order -->
+    <!-- 1. Configuration and constants -->
+    <script src="js/config.js"></script>
+    
+    <!-- 2. Tutorial and Help -->
+    <script src="js/tutorial.js"></script>
+    
+    <!-- 3. Backend API -->
+    <script src="js/api.js"></script>
+    
+    <!-- 4. Core systems -->
+    <script src="js/sound.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/coins-shop.js"></script>
+    
+    <!-- 5. Input and Camera -->
+    <script src="js/input.js"></script>
+    <script src="js/camera.js"></script>
+    
+    <!-- 6. Game objects -->
+    <script src="js/particles.js"></script>
+    <script src="js/projectiles.js"></script>
+    <script src="js/tilemap.js"></script>
+    <script src="js/pickups.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/enemies.js"></script>
+    
+    <!-- 7. Level management -->
+    <script src="js/level-manager.js"></script>
+    <script src="js/level-editor.js"></script>
+    
+    <!-- 8. UI and rendering -->
+    <script src="js/ui.js"></script>
+    
+    <!-- 9. Main game loop (must be last) -->
+    <script src="js/main.js"></script>
 </body>
 </html>
