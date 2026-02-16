@@ -48,13 +48,24 @@ const gameState = {
     transitioning: false,
     transitionAlpha: 0,
     score: 0,
+    showMenu: true,
     gameOver: false,
     victory: false,
-    showMenu: true,
-    difficulty: 'normal', // 'easy', 'normal', 'hard'
+    difficulty: 'normal',
     showSettings: false,
     showLevelEditor: false,
-    showShop: false
+    showShop: false,
+    // Backend integration
+    showAuth: false,
+    authMode: 'login', // 'login' or 'register'
+    isLoggedIn: false,
+    user: null,
+    token: null,
+    // Tutorial and Help
+    showTutorial: false,
+    tutorialStep: 0,
+    tutorialCompleted: localStorage.getItem('tutorialCompleted') === 'true',
+    showHelp: false
 };
 
 // Difficulty settings
@@ -84,6 +95,365 @@ const DIFFICULTY_SETTINGS = {
 
 function getDifficulty() {
     return DIFFICULTY_SETTINGS[gameState.difficulty] || DIFFICULTY_SETTINGS.normal;
+}
+
+// ============================================================================
+// TUTORIAL SYSTEM
+// ============================================================================
+
+const TUTORIAL_STEPS = [
+    {
+        title: '🎮 Vítej v DOOM Platformer!',
+        content: [
+            'Toto je 2D akční platformer s DOOM estetikou.',
+            '',
+            '🎯 CÍL: Dostat se na konec každého levelu',
+            '💀 Zabíjej démony, sbírej mince a vylepšení',
+            '🏆 Soutěž s ostatními hráči online!',
+            '',
+            'Stiskni ENTER pro pokračování...'
+        ]
+    },
+    {
+        title: '🎮 Základní ovládání',
+        content: [
+            '⬅️➡️ WASD / Šipky - Pohyb a skok',
+            '🔫 J / Z / Ctrl - Střelba',
+            '🔄 Q / E nebo 1-6 - Změna zbraně',
+            '⏸️ P / ESC - Pauza',
+            '',
+            '💡 TIP: Drž šipku nahoru pro střelbu nahoru!',
+            '',
+            'Stiskni ENTER pro pokračování...'
+        ]
+    },
+    {
+        title: '🛍️ Shop a Skin systém',
+        content: [
+            '💰 Sbírej MINCE za zabíjení nepřátel',
+            '🎨 Kup SKINY v shopu (tlačítko B)',
+            '✨ Každý skin má unikátní vzhled',
+            '',
+            '🏪 Shop obsahuje:',
+            '  • Různé barevné varianty',
+            '  • Speciální efekty',
+            '  • Legendární skiny',
+            '',
+            'Stiskni ENTER pro pokračování...'
+        ]
+    },
+    {
+        title: '🌐 Online Features',
+        content: [
+            '📝 Stiskni M pro přihlášení/registraci',
+            '🏆 Tvé skóre se automaticky ukládá online',
+            '📊 Soutěž na globálním žebříčku',
+            '💾 Ukládej hru do cloudu',
+            '',
+            '⚡ Hrát můžeš i offline!',
+            '  (lokální high score se ukládá vždy)',
+            '',
+            'Stiskni ENTER pro pokračování...'
+        ]
+    },
+    {
+        title: '⚔️ Combat & Level Tips',
+        content: [
+            '🎯 Každá zbraň má jiné vlastnosti:',
+            '  • Pistol - neomezené náboje',
+            '  • Shotgun - velká síla na blízko',
+            '  • Machinegun - rychlá palba',
+            '  • Plasma - silné projektily',
+            '  • Rocket - exploze a rocket jump!',
+            '',
+            '💡 ROCKET JUMP: Střílej dolů při skoku!',
+            '',
+            'Stiskni ENTER pro začátek hry...'
+        ]
+    }
+];
+
+const HELP_CONTENT = {
+    controls: [
+        { key: 'WASD / Šipky', desc: 'Pohyb vlevo/vpravo, skok' },
+        { key: 'J / Z / Ctrl', desc: 'Střelba' },
+        { key: 'Šipka nahoru + Střelba', desc: 'Střelba nahoru' },
+        { key: 'Šipka dolů + Střelba', desc: 'Střelba dolů (rocket jump!)' },
+        { key: 'Q / E', desc: 'Přepínání zbraní' },
+        { key: '1-6', desc: 'Přímá volba zbraně' },
+        { key: 'P / ESC', desc: 'Pauza' },
+        { key: 'M', desc: 'Přihlášení/Registrace (menu)' },
+        { key: 'B', desc: 'Otevřít Skin Shop (menu)' },
+        { key: 'H', desc: 'Tato nápověda' },
+        { key: 'T', desc: 'Znovu zobrazit tutorial' }
+    ],
+    advanced: [
+        { key: 'F', desc: 'Fullscreen režim' },
+        { key: 'L', desc: 'Level editor' },
+        { key: 'F5', desc: 'Uložit hru (lokálně)' },
+        { key: 'F9', desc: 'Načíst hru (lokálně)' }
+    ],
+    gameplay: [
+        '🎯 Dostaň se na konec levelu (zelený exit)',
+        '💰 Sbírej mince - použij je v shopu',
+        '🔫 Každá zbraň má jiné vlastnosti',
+        '💊 Sbírej health a armor pickupy',
+        '📦 Najdi checkpointy pro respawn',
+        '🚀 Rocket jump: střílej dolů při skoku!',
+        '🏆 Tvé skóre se počítá z času a zabití',
+        '⚡ Chain kill bonus za rychlé zabití'
+    ],
+    online: [
+        '📝 Registruj se pro online features (M)',
+        '🏆 Automatické nahrávání skóre',
+        '📊 Soutěž na globálním žebříčku',
+        '💾 Cloud save (připraveno)',
+        '🎮 Lze hrát i offline'
+    ]
+};
+
+function showTutorial() {
+    gameState.showTutorial = true;
+    gameState.tutorialStep = 0;
+}
+
+function nextTutorialStep() {
+    gameState.tutorialStep++;
+    if (gameState.tutorialStep >= TUTORIAL_STEPS.length) {
+        gameState.showTutorial = false;
+        gameState.tutorialCompleted = true;
+        localStorage.setItem('tutorialCompleted', 'true');
+        // Start game after tutorial
+        if (gameState.showMenu) {
+            startGame();
+        }
+    }
+}
+
+function skipTutorial() {
+    gameState.showTutorial = false;
+    gameState.tutorialCompleted = true;
+    localStorage.setItem('tutorialCompleted', 'true');
+}
+
+// ============================================================================
+// BACKEND API CLIENT
+// ============================================================================
+
+const API_URL = 'http://localhost:3000/api';
+
+const API = {
+    async register(username, email, password) {
+        const response = await fetch(`${API_URL}/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, email, password })
+        });
+        return await response.json();
+    },
+
+    async login(username, password) {
+        const response = await fetch(`${API_URL}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        return await response.json();
+    },
+
+    async getProfile() {
+        const token = localStorage.getItem('token');
+        if (!token) return null;
+        
+        const response = await fetch(`${API_URL}/auth/profile`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        return await response.json();
+    },
+
+    async submitScore(score, level, coins) {
+        const token = localStorage.getItem('token');
+        if (!token) return null;
+        
+        const response = await fetch(`${API_URL}/scores`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ score, level, coins })
+        });
+        return await response.json();
+    },
+
+    async getLeaderboard(timeframe = 'all', limit = 10) {
+        const response = await fetch(`${API_URL}/leaderboard?timeframe=${timeframe}&limit=${limit}`);
+        return await response.json();
+    },
+
+    async saveGame(saveData) {
+        const token = localStorage.getItem('token');
+        if (!token) return null;
+        
+        const response = await fetch(`${API_URL}/save`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ saveData })
+        });
+        return await response.json();
+    },
+
+    async loadGame() {
+        const token = localStorage.getItem('token');
+        if (!token) return null;
+        
+        const response = await fetch(`${API_URL}/save`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        return data.saveData || null;
+    }
+};
+
+// Auth form state
+const authForm = {
+    username: '',
+    email: '',
+    password: '',
+    error: '',
+    activeField: 'username',
+    cursor: 0
+};
+
+// Load token on startup
+if (localStorage.getItem('token')) {
+    gameState.token = localStorage.getItem('token');
+    gameState.isLoggedIn = true;
+    
+    // Load user profile
+    API.getProfile().then(data => {
+        if (data && !data.error) {
+            gameState.user = data;
+            console.log('Logged in as:', data.username);
+        } else {
+            localStorage.removeItem('token');
+            gameState.isLoggedIn = false;
+        }
+    });
+}
+
+// Auth form helpers
+function resetAuthForm() {
+    authForm.username = '';
+    authForm.email = '';
+    authForm.password = '';
+    authForm.error = '';
+    authForm.activeField = 'username';
+}
+
+function handleAuthInput(e) {
+    // ESC to close
+    if (e.code === 'Escape') {
+        gameState.showAuth = false;
+        return;
+    }
+
+    // TAB to switch mode
+    if (e.code === 'Tab') {
+        gameState.authMode = gameState.authMode === 'login' ? 'register' : 'login';
+        authForm.activeField = 'username';
+        authForm.error = '';
+        return;
+    }
+
+    // Arrow keys to switch fields
+    if (e.code === 'ArrowUp') {
+        const fields = gameState.authMode === 'register' ? ['username', 'email', 'password'] : ['username', 'password'];
+        const idx = fields.indexOf(authForm.activeField);
+        authForm.activeField = fields[(idx - 1 + fields.length) % fields.length];
+        return;
+    }
+    if (e.code === 'ArrowDown') {
+        const fields = gameState.authMode === 'register' ? ['username', 'email', 'password'] : ['username', 'password'];
+        const idx = fields.indexOf(authForm.activeField);
+        authForm.activeField = fields[(idx + 1) % fields.length];
+        return;
+    }
+
+    // ENTER to submit
+    if (e.code === 'Enter') {
+        submitAuthForm();
+        return;
+    }
+
+    // Backspace
+    if (e.code === 'Backspace') {
+        if (authForm[authForm.activeField].length > 0) {
+            authForm[authForm.activeField] = authForm[authForm.activeField].slice(0, -1);
+        }
+        return;
+    }
+
+    // Type characters
+    if (e.key.length === 1) {
+        const maxLen = authForm.activeField === 'email' ? 50 : 20;
+        if (authForm[authForm.activeField].length < maxLen) {
+            authForm[authForm.activeField] += e.key;
+        }
+    }
+}
+
+async function submitAuthForm() {
+    authForm.error = '';
+
+    // Validation
+    if (!authForm.username || authForm.username.length < 3) {
+        authForm.error = 'Username must be at least 3 characters';
+        return;
+    }
+    if (!authForm.password || authForm.password.length < 6) {
+        authForm.error = 'Password must be at least 6 characters';
+        return;
+    }
+    if (gameState.authMode === 'register' && !authForm.email) {
+        authForm.error = 'Email is required';
+        return;
+    }
+
+    try {
+        let result;
+        if (gameState.authMode === 'register') {
+            result = await API.register(authForm.username, authForm.email, authForm.password);
+        } else {
+            result = await API.login(authForm.username, authForm.password);
+        }
+
+        if (result.error) {
+            authForm.error = result.error;
+        } else if (result.token) {
+            // Success!
+            localStorage.setItem('token', result.token);
+            gameState.token = result.token;
+            gameState.isLoggedIn = true;
+            gameState.user = result.user;
+            gameState.showAuth = false;
+            
+            console.log('Auth success:', result.user.username);
+            
+            // Update rank
+            API.getProfile().then(data => {
+                if (data && !data.error) {
+                    gameState.user = data;
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Auth error:', error);
+        authForm.error = 'Connection error. Is the server running?';
+    }
 }
 
 // ============================================================================
@@ -2428,6 +2798,33 @@ class InputHandler {
     }
 
     handleKeyDown(e) {
+        // Handle tutorial
+        if (gameState.showTutorial) {
+            if (e.code === 'Enter') {
+                nextTutorialStep();
+            } else if (e.code === 'Escape') {
+                skipTutorial();
+            }
+            e.preventDefault();
+            return;
+        }
+
+        // Handle help screen
+        if (gameState.showHelp) {
+            if (e.code === 'KeyH' || e.code === 'Escape') {
+                gameState.showHelp = false;
+            }
+            e.preventDefault();
+            return;
+        }
+
+        // Handle auth screen
+        if (gameState.showAuth) {
+            handleAuthInput(e);
+            e.preventDefault();
+            return;
+        }
+
         // Handle shop input when shop is open
         if (gameState.showShop) {
             switch (e.code) {
@@ -2456,6 +2853,19 @@ class InputHandler {
             if (e.code === 'Digit3') gameState.difficulty = 'hard';
             // Open shop from menu
             if (e.code === 'KeyB') this.shopOpen = true;
+            // Open auth screen
+            if (e.code === 'KeyM') {
+                gameState.showAuth = true;
+                resetAuthForm();
+            }
+            // Open help
+            if (e.code === 'KeyH') {
+                gameState.showHelp = true;
+            }
+            // Show tutorial
+            if (e.code === 'KeyT') {
+                showTutorial();
+            }
             return;
         }
 
@@ -6189,38 +6599,362 @@ function drawStartMenu() {
         ctx.fillText(`Coins: ${coinSystem.balance}`, CANVAS_WIDTH / 2, 355);
     }
 
-    // Controls
+    // Login/Register button
+    ctx.font = 'bold 16px Impact';
+    if (gameState.isLoggedIn && gameState.user) {
+        ctx.fillStyle = '#00ff00';
+        ctx.fillText(`Logged in as: ${gameState.user.username}`, CANVAS_WIDTH / 2, 375);
+        ctx.font = '12px Impact';
+        ctx.fillStyle = '#888';
+        ctx.fillText(`Rank: #${gameState.user.rank || '?'} | Coins: ${gameState.user.coins || 0}`, CANVAS_WIDTH / 2, 390);
+    } else {
+        ctx.fillStyle = '#4488ff';
+        ctx.fillText('Press M to Login/Register (Online Features)', CANVAS_WIDTH / 2, 375);
+    }
+
+    // Help and Tutorial buttons
+    ctx.font = 'bold 14px Impact';
+    ctx.fillStyle = '#ffaa00';
+    ctx.fillText('H - Nápověda | T - Tutorial', CANVAS_WIDTH / 2, 405);
+
+    // Controls preview
     ctx.font = 'bold 12px Impact, Arial Black, sans-serif';
     ctx.fillStyle = '#888';
-    ctx.fillText('CONTROLS:', CANVAS_WIDTH / 2, 378);
-    ctx.font = '10px Courier New, monospace';
+    ctx.fillText('ZÁKLADNÍ OVLÁDÁNÍ:', CANVAS_WIDTH / 2, 430);
+    ctx.font = '11px Courier New, monospace';
     ctx.fillStyle = '#666';
-    ctx.fillText('WASD / Arrows - Move & Jump | J / Z / Ctrl - Shoot', CANVAS_WIDTH / 2, 395);
-    ctx.fillText('1-6 / Q/E - Switch Weapons | P / Escape - Pause', CANVAS_WIDTH / 2, 410);
-    ctx.fillText('F - Fullscreen | L - Level Editor | F5 - Save | F9 - Load', CANVAS_WIDTH / 2, 425);
+    ctx.fillText('WASD - Pohyb | J/Z - Střelba | Q/E - Změna zbraně', CANVAS_WIDTH / 2, 448);
+    ctx.fillText('Stiskni H pro kompletní nápovědu', CANVAS_WIDTH / 2, 463);
 
     // High scores and achievements
     const highScore = highScoreSystem ? highScoreSystem.getHighScore() : 0;
     ctx.font = 'bold 14px Impact, Arial Black, sans-serif';
     ctx.fillStyle = '#ffaa00';
-    ctx.fillText(`HIGH SCORE: ${highScore}`, CANVAS_WIDTH / 2 - 100, 465);
+    ctx.fillText(`LOCAL HIGH SCORE: ${highScore}`, CANVAS_WIDTH / 2 - 100, 485);
 
     if (achievementSystem) {
         ctx.fillStyle = '#aa88ff';
-        ctx.fillText(`ACHIEVEMENTS: ${achievementSystem.getUnlockedCount()}/${achievementSystem.getTotalCount()}`, CANVAS_WIDTH / 2 + 100, 465);
+        ctx.fillText(`ACHIEVEMENTS: ${achievementSystem.getUnlockedCount()}/${achievementSystem.getTotalCount()}`, CANVAS_WIDTH / 2 + 100, 485);
     }
 
     // Skin info
     if (skinManager) {
         ctx.font = '11px Impact';
         ctx.fillStyle = '#888';
-        ctx.fillText(`Skin: ${skinManager.getEquippedSkin().name}`, CANVAS_WIDTH / 2, 485);
+        ctx.fillText(`Skin: ${skinManager.getEquippedSkin().name}`, CANVAS_WIDTH / 2, 505);
     }
 
     // Version info
     ctx.font = '10px Arial';
     ctx.fillStyle = '#333';
-    ctx.fillText('v3.0 - Shop Edition', CANVAS_WIDTH / 2, CANVAS_HEIGHT - 10);
+    ctx.fillText('v3.5 - Online Edition', CANVAS_WIDTH / 2, CANVAS_HEIGHT - 10);
+}
+
+function drawAuthScreen() {
+    // Dark overlay
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+    // Title
+    ctx.font = 'bold 32px Impact, Arial Black, sans-serif';
+    ctx.fillStyle = '#8b0000';
+    ctx.textAlign = 'center';
+    ctx.fillText(gameState.authMode === 'login' ? 'LOGIN' : 'REGISTER', CANVAS_WIDTH / 2, 100);
+
+    // Mode toggle hint
+    ctx.font = '14px Impact';
+    ctx.fillStyle = '#666';
+    ctx.fillText(`Press TAB to switch to ${gameState.authMode === 'login' ? 'Register' : 'Login'}`, CANVAS_WIDTH / 2, 130);
+
+    const formY = 180;
+    const fieldHeight = 50;
+
+    // Username field
+    drawInputField('Username:', authForm.username, formY, authForm.activeField === 'username');
+
+    // Email field (register only)
+    if (gameState.authMode === 'register') {
+        drawInputField('Email:', authForm.email, formY + fieldHeight, authForm.activeField === 'email');
+        drawInputField('Password:', '*'.repeat(authForm.password.length), formY + fieldHeight * 2, authForm.activeField === 'password');
+    } else {
+        drawInputField('Password:', '*'.repeat(authForm.password.length), formY + fieldHeight, authForm.activeField === 'password');
+    }
+
+    // Error message
+    if (authForm.error) {
+        ctx.font = 'bold 14px Impact';
+        ctx.fillStyle = '#ff4444';
+        ctx.fillText(authForm.error, CANVAS_WIDTH / 2, formY + (gameState.authMode === 'register' ? 180 : 140));
+    }
+
+    // Instructions
+    const instructY = formY + (gameState.authMode === 'register' ? 220 : 180);
+    ctx.font = '12px Impact';
+    ctx.fillStyle = '#888';
+    ctx.fillText('Type to enter text | ENTER to submit | ESC to cancel', CANVAS_WIDTH / 2, instructY);
+    ctx.fillText('UP/DOWN or Click to switch fields | TAB to switch mode', CANVAS_WIDTH / 2, instructY + 20);
+
+    // Submit button (visual)
+    const buttonY = instructY + 50;
+    const isHoverButton = false; // Simple version
+    ctx.fillStyle = isHoverButton ? '#00ff00' : '#00aa00';
+    ctx.fillRect(CANVAS_WIDTH / 2 - 100, buttonY, 200, 40);
+    ctx.strokeStyle = '#00ff00';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(CANVAS_WIDTH / 2 - 100, buttonY, 200, 40);
+    
+    ctx.font = 'bold 16px Impact';
+    ctx.fillStyle = '#000';
+    ctx.fillText(gameState.authMode === 'login' ? 'LOGIN' : 'REGISTER', CANVAS_WIDTH / 2, buttonY + 25);
+}
+
+function drawInputField(label, value, y, active) {
+    const fieldWidth = 400;
+    const fieldHeight = 35;
+    const x = CANVAS_WIDTH / 2 - fieldWidth / 2;
+
+    // Label
+    ctx.font = 'bold 14px Impact';
+    ctx.fillStyle = '#888';
+    ctx.textAlign = 'left';
+    ctx.fillText(label, x, y - 10);
+
+    // Field background
+    ctx.fillStyle = active ? '#1a1a1a' : '#0a0a0a';
+    ctx.fillRect(x, y, fieldWidth, fieldHeight);
+
+    // Field border
+    ctx.strokeStyle = active ? '#00ff00' : '#444';
+    ctx.lineWidth = active ? 3 : 2;
+    ctx.strokeRect(x, y, fieldWidth, fieldHeight);
+
+    // Value text
+    ctx.font = '16px Courier New, monospace';
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'left';
+    ctx.fillText(value + (active ? '|' : ''), x + 10, y + 23);
+}
+
+function drawTutorial() {
+    // Dark overlay
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+    const step = TUTORIAL_STEPS[gameState.tutorialStep];
+    if (!step) return;
+
+    // Window background
+    const boxWidth = 600;
+    const boxHeight = 400;
+    const boxX = (CANVAS_WIDTH - boxWidth) / 2;
+    const boxY = (CANVAS_HEIGHT - boxHeight) / 2;
+
+    // Box shadow
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+    ctx.fillRect(boxX + 5, boxY + 5, boxWidth, boxHeight);
+
+    // Box background
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
+
+    // Box border
+    ctx.strokeStyle = '#8b0000';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
+    ctx.strokeStyle = '#ff0000';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(boxX + 3, boxY + 3, boxWidth - 6, boxHeight - 6);
+
+    // Title
+    ctx.font = 'bold 28px Impact, Arial Black, sans-serif';
+    ctx.fillStyle = '#ff4444';
+    ctx.textAlign = 'center';
+    ctx.fillText(step.title, CANVAS_WIDTH / 2, boxY + 50);
+
+    // Step indicator
+    ctx.font = '14px Impact';
+    ctx.fillStyle = '#666';
+    ctx.fillText(`Krok ${gameState.tutorialStep + 1} / ${TUTORIAL_STEPS.length}`, CANVAS_WIDTH / 2, boxY + 75);
+
+    // Content
+    ctx.font = '16px Arial';
+    ctx.textAlign = 'left';
+    let contentY = boxY + 110;
+    
+    step.content.forEach(line => {
+        if (line === '') {
+            contentY += 10;
+        } else if (line.includes('TIP:') || line.includes('CÍL:')) {
+            ctx.fillStyle = '#ffaa00';
+            ctx.font = 'bold 16px Arial';
+            ctx.fillText(line, boxX + 30, contentY);
+            ctx.font = '16px Arial';
+            contentY += 25;
+        } else if (line.startsWith('  •')) {
+            ctx.fillStyle = '#ccc';
+            ctx.fillText(line, boxX + 50, contentY);
+            contentY += 22;
+        } else if (line.startsWith('Stiskni ENTER')) {
+            const pulse = Math.sin(Date.now() / 300) * 0.3 + 0.7;
+            ctx.globalAlpha = pulse;
+            ctx.fillStyle = '#00ff00';
+            ctx.font = 'bold 16px Impact';
+            ctx.textAlign = 'center';
+            ctx.fillText(line, CANVAS_WIDTH / 2, contentY);
+            ctx.globalAlpha = 1;
+            ctx.font = '16px Arial';
+            ctx.textAlign = 'left';
+            contentY += 25;
+        } else {
+            ctx.fillStyle = '#fff';
+            ctx.fillText(line, boxX + 30, contentY);
+            contentY += 22;
+        }
+    });
+
+    // Buttons
+    const btnY = boxY + boxHeight - 60;
+    
+    // Skip button
+    ctx.fillStyle = '#444';
+    ctx.fillRect(boxX + 30, btnY, 120, 35);
+    ctx.strokeStyle = '#666';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(boxX + 30, btnY, 120, 35);
+    ctx.font = 'bold 14px Impact';
+    ctx.fillStyle = '#aaa';
+    ctx.textAlign = 'center';
+    ctx.fillText('ESC - Přeskočit', boxX + 90, btnY + 22);
+
+    // Step indicator dots
+    const dotStartX = CANVAS_WIDTH / 2 - (TUTORIAL_STEPS.length * 15) / 2;
+    for (let i = 0; i < TUTORIAL_STEPS.length; i++) {
+        ctx.fillStyle = i === gameState.tutorialStep ? '#ff4444' : '#333';
+        ctx.beginPath();
+        ctx.arc(dotStartX + i * 15, btnY + 17, 5, 0, Math.PI * 2);
+        ctx.fill();
+    }
+}
+
+function drawHelp() {
+    // Dark overlay
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+    // Window background
+    const boxWidth = 700;
+    const boxHeight = 520;
+    const boxX = (CANVAS_WIDTH - boxWidth) / 2;
+    const boxY = (CANVAS_HEIGHT - boxHeight) / 2;
+
+    // Box shadow
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+    ctx.fillRect(boxX + 5, boxY + 5, boxWidth, boxHeight);
+
+    // Box background
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
+
+    // Box border
+    ctx.strokeStyle = '#8b0000';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
+    ctx.strokeStyle = '#ff0000';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(boxX + 3, boxY + 3, boxWidth - 6, boxHeight - 6);
+
+    // Title
+    ctx.font = 'bold 32px Impact, Arial Black, sans-serif';
+    ctx.fillStyle = '#ff4444';
+    ctx.textAlign = 'center';
+    ctx.fillText('📖 NÁPOVĚDA', CANVAS_WIDTH / 2, boxY + 45);
+
+    let contentY = boxY + 80;
+    const leftCol = boxX + 30;
+    const rightCol = boxX + boxWidth / 2 + 20;
+
+    // Left column - Controls
+    ctx.font = 'bold 18px Impact';
+    ctx.fillStyle = '#ffaa00';
+    ctx.textAlign = 'left';
+    ctx.fillText('🎮 OVLÁDÁNÍ:', leftCol, contentY);
+    contentY += 25;
+
+    ctx.font = '13px Courier New, monospace';
+    HELP_CONTENT.controls.slice(0, 8).forEach(control => {
+        ctx.fillStyle = '#00ff00';
+        ctx.fillText(control.key, leftCol, contentY);
+        ctx.fillStyle = '#ccc';
+        ctx.fillText('- ' + control.desc, leftCol + 150, contentY);
+        contentY += 18;
+    });
+
+    contentY += 10;
+    ctx.font = 'bold 18px Impact';
+    ctx.fillStyle = '#ffaa00';
+    ctx.fillText('⚙️ POKROČILÉ:', leftCol, contentY);
+    contentY += 25;
+
+    ctx.font = '13px Courier New, monospace';
+    HELP_CONTENT.advanced.forEach(control => {
+        ctx.fillStyle = '#00ff00';
+        ctx.fillText(control.key, leftCol, contentY);
+        ctx.fillStyle = '#ccc';
+        ctx.fillText('- ' + control.desc, leftCol + 150, contentY);
+        contentY += 18;
+    });
+
+    // Right column - Gameplay & Online
+    contentY = boxY + 80;
+    ctx.font = 'bold 18px Impact';
+    ctx.fillStyle = '#ffaa00';
+    ctx.fillText('💡 GAMEPLAY TIPY:', rightCol, contentY);
+    contentY += 25;
+
+    ctx.font = '13px Arial';
+    ctx.fillStyle = '#fff';
+    HELP_CONTENT.gameplay.forEach(tip => {
+        // Word wrap
+        const maxWidth = boxWidth / 2 - 60;
+        const words = tip.split(' ');
+        let line = '';
+        
+        words.forEach(word => {
+            const testLine = line + word + ' ';
+            const metrics = ctx.measureText(testLine);
+            if (metrics.width > maxWidth && line !== '') {
+                ctx.fillText(line, rightCol, contentY);
+                line = word + ' ';
+                contentY += 18;
+            } else {
+                line = testLine;
+            }
+        });
+        ctx.fillText(line, rightCol, contentY);
+        contentY += 20;
+    });
+
+    contentY += 5;
+    ctx.font = 'bold 18px Impact';
+    ctx.fillStyle = '#ffaa00';
+    ctx.fillText('🌐 ONLINE FEATURES:', rightCol, contentY);
+    contentY += 25;
+
+    ctx.font = '13px Arial';
+    ctx.fillStyle = '#4488ff';
+    HELP_CONTENT.online.forEach(feature => {
+        ctx.fillText(feature, rightCol, contentY);
+        contentY += 20;
+    });
+
+    // Close instruction
+    const pulse = Math.sin(Date.now() / 300) * 0.3 + 0.7;
+    ctx.globalAlpha = pulse;
+    ctx.font = 'bold 16px Impact';
+    ctx.fillStyle = '#00ff00';
+    ctx.textAlign = 'center';
+    ctx.fillText('Stiskni H nebo ESC pro zavření', CANVAS_WIDTH / 2, boxY + boxHeight - 25);
+    ctx.globalAlpha = 1;
 }
 
 function drawPauseMenu() {
@@ -6280,7 +7014,18 @@ function drawGameOverMenu() {
     if (gameState.score >= highScore && gameState.score > 0) {
         ctx.font = 'bold 20px Impact, Arial Black, sans-serif';
         ctx.fillStyle = '#00ff00';
-        ctx.fillText('NEW HIGH SCORE!', CANVAS_WIDTH / 2, 340);
+        ctx.fillText('NEW LOCAL HIGH SCORE!', CANVAS_WIDTH / 2, 340);
+    }
+
+    // Online status
+    if (gameState.isLoggedIn) {
+        ctx.font = '14px Impact';
+        ctx.fillStyle = '#4488ff';
+        ctx.fillText('✓ Score submitted to online leaderboard', CANVAS_WIDTH / 2, 370);
+    } else {
+        ctx.font = '14px Impact';
+        ctx.fillStyle = '#888';
+        ctx.fillText('Press M to login and compete online', CANVAS_WIDTH / 2, 370);
     }
 
     // Restart prompt
@@ -6621,6 +7366,21 @@ function render() {
         shopUI.render(ctx);
     }
 
+    // Render auth screen
+    if (gameState.showAuth) {
+        drawAuthScreen();
+    }
+
+    // Render tutorial
+    if (gameState.showTutorial) {
+        drawTutorial();
+    }
+
+    // Render help screen
+    if (gameState.showHelp) {
+        drawHelp();
+    }
+
     // Render achievement notifications
     if (achievementSystem) {
         achievementSystem.render(ctx);
@@ -6664,6 +7424,12 @@ function gameLoop(timestamp) {
 }
 
 function startGame() {
+    // Show tutorial on first run
+    if (!gameState.tutorialCompleted) {
+        showTutorial();
+        return;
+    }
+
     gameState.showMenu = false;
     gameState.started = true;
     gameState.gameOver = false;
@@ -6683,9 +7449,24 @@ function startGame() {
 }
 
 function restartGame() {
-    // Save high score
+    // Save high score locally
     if (highScoreSystem) {
         highScoreSystem.addScore(gameState.score, gameState.currentLevel);
+    }
+
+    // Submit score to online leaderboard if logged in
+    if (gameState.isLoggedIn && gameState.score > 0) {
+        const coins = coinSystem ? coinSystem.balance : 0;
+        API.submitScore(gameState.score, gameState.currentLevel, coins)
+            .then(result => {
+                if (result && !result.error) {
+                    console.log('Score submitted to online leaderboard!');
+                    if (result.newHighScore) {
+                        console.log('🏆 New personal best!');
+                    }
+                }
+            })
+            .catch(err => console.error('Failed to submit score:', err));
     }
 
     gameState.gameOver = false;
