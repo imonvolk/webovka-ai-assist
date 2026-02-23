@@ -101,7 +101,8 @@ function update(dt) {
     }
     
     // Handle return to menu (M key during pause)
-    if (gameState.paused && input.keys['KeyM'] && gameState.started) {
+    if (gameState.paused && input.menuReturn && gameState.started) {
+        input.menuReturn = false;
         returnToMenu();
     }
 

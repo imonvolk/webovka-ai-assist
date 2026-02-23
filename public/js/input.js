@@ -28,6 +28,7 @@ class InputHandler {
         this.shopSort = false;
         this.shopTry = false;
         this.shopOpen = false;
+        this.menuReturn = false;
 
         window.addEventListener('keydown', (e) => this.handleKeyDown(e));
         window.addEventListener('keyup', (e) => this.handleKeyUp(e));
@@ -105,7 +106,7 @@ class InputHandler {
             return;
         }
 
-        if (gameState.gameOver) {
+        if (gameState.gameOver || gameState.victory) {
             if (e.code === 'Enter' || e.code === 'Space') {
                 this.enterPressed = true;
                 e.preventDefault();
@@ -171,6 +172,9 @@ class InputHandler {
                 break;
             case 'KeyB':
                 if (gameState.paused) this.shopOpen = true;
+                break;
+            case 'KeyM':
+                if (gameState.paused) this.menuReturn = true;
                 break;
             case 'Digit1':
                 this.weaponSwitch = 1;

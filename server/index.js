@@ -119,12 +119,12 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
         }
 
         // Check if user exists
-        const existing = db.getUserByUsername(username);
+        const existing = await db.getUserByUsername(username);
         if (existing) {
             return res.status(409).json({ error: 'Username already taken' });
         }
 
-        const existingEmail = db.getUserByEmail(email);
+        const existingEmail = await db.getUserByEmail(email);
         if (existingEmail) {
             return res.status(409).json({ error: 'Email already registered' });
         }
@@ -133,7 +133,7 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Create user
-        const userId = db.createUser(username, email, hashedPassword);
+        const userId = await db.createUser(username, email, hashedPassword);
 
         // Generate token
         const token = jwt.sign(
@@ -163,7 +163,7 @@ app.post('/api/auth/login', authLimiter, async (req, res) => {
         }
 
         // Get user
-        const user = db.getUserByUsername(username);
+        const user = await db.getUserByUsername(username);
         if (!user) {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
@@ -175,7 +175,7 @@ app.post('/api/auth/login', authLimiter, async (req, res) => {
         }
 
         // Update last login
-        db.updateLastLogin(user.id);
+        await db.updateLastLogin(user.id);
 
         // Generate token
         const token = jwt.sign(
@@ -202,9 +202,9 @@ app.post('/api/auth/login', authLimiter, async (req, res) => {
 });
 
 // Get current user profile
-app.get('/api/auth/profile', authenticateToken, (req, res) => {
+app.get('/api/auth/profile', authenticateToken, async (req, res) => {
     try {
-        const user = db.getUserById(req.user.id);
+        const user = await db.getUserById(req.user.id);
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
@@ -229,7 +229,7 @@ app.get('/api/auth/profile', authenticateToken, (req, res) => {
 // ============================================================================
 
 // Submit score
-app.post('/api/scores', authenticateToken, (req, res) => {
+app.post('/api/scores', authenticateToken, async (req, res) => {
     try {
         const { score, level, coins } = req.body;
 
@@ -237,21 +237,21 @@ app.post('/api/scores', authenticateToken, (req, res) => {
             return res.status(400).json({ error: 'Score and level required' });
         }
 
-        const scoreId = db.submitScore(req.user.id, score, level, coins || 0);
+        const scoreId = await db.submitScore(req.user.id, score, level, coins || 0);
 
         // Update user high score if needed
-        const user = db.getUserById(req.user.id);
+        const user = await db.getUserById(req.user.id);
         if (!user.high_score || score > user.high_score) {
-            db.updateHighScore(req.user.id, score);
+            await db.updateHighScore(req.user.id, score);
         }
 
         // Update coins
         if (coins) {
-            db.updateCoins(req.user.id, user.coins + coins);
+            await db.updateCoins(req.user.id, user.coins + coins);
         }
 
         // Increment games played
-        db.incrementGamesPlayed(req.user.id);
+        await db.incrementGamesPlayed(req.user.id);
 
         res.json({
             message: 'Score submitted',
@@ -265,10 +265,10 @@ app.post('/api/scores', authenticateToken, (req, res) => {
 });
 
 // Get user's scores
-app.get('/api/scores/user', authenticateToken, (req, res) => {
+app.get('/api/scores/user', authenticateToken, async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 10;
-        const scores = db.getUserScores(req.user.id, limit);
+        const scores = await db.getUserScores(req.user.id, limit);
         res.json({ scores });
     } catch (error) {
         console.error('Get user scores error:', error);
@@ -277,7 +277,7 @@ app.get('/api/scores/user', authenticateToken, (req, res) => {
 });
 
 // Get leaderboard
-app.get('/api/leaderboard', (req, res) => {
+app.get('/api/leaderboard', async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 100;
         const timeframe = req.query.timeframe || 'all'; // all, daily, weekly
@@ -285,13 +285,13 @@ app.get('/api/leaderboard', (req, res) => {
         let leaderboard;
         switch (timeframe) {
             case 'daily':
-                leaderboard = db.getDailyLeaderboard(limit);
+                leaderboard = await db.getDailyLeaderboard(limit);
                 break;
             case 'weekly':
-                leaderboard = db.getWeeklyLeaderboard(limit);
+                leaderboard = await db.getWeeklyLeaderboard(limit);
                 break;
             default:
-                leaderboard = db.getAllTimeLeaderboard(limit);
+                leaderboard = await db.getAllTimeLeaderboard(limit);
         }
 
         res.json({ leaderboard, timeframe });
@@ -302,9 +302,9 @@ app.get('/api/leaderboard', (req, res) => {
 });
 
 // Get player rank
-app.get('/api/scores/rank', authenticateToken, (req, res) => {
+app.get('/api/scores/rank', authenticateToken, async (req, res) => {
     try {
-        const rank = db.getUserRank(req.user.id);
+        const rank = await db.getUserRank(req.user.id);
         res.json({ rank });
     } catch (error) {
         console.error('Get rank error:', error);
@@ -317,7 +317,7 @@ app.get('/api/scores/rank', authenticateToken, (req, res) => {
 // ============================================================================
 
 // Save game progress
-app.post('/api/save', authenticateToken, (req, res) => {
+app.post('/api/save', authenticateToken, async (req, res) => {
     try {
         const { saveData } = req.body;
 
@@ -325,7 +325,7 @@ app.post('/api/save', authenticateToken, (req, res) => {
             return res.status(400).json({ error: 'Save data required' });
         }
 
-        db.saveGameProgress(req.user.id, JSON.stringify(saveData));
+        await db.saveGameProgress(req.user.id, JSON.stringify(saveData));
 
         res.json({ message: 'Game saved successfully' });
     } catch (error) {
@@ -335,9 +335,9 @@ app.post('/api/save', authenticateToken, (req, res) => {
 });
 
 // Load game progress
-app.get('/api/save', authenticateToken, (req, res) => {
+app.get('/api/save', authenticateToken, async (req, res) => {
     try {
-        const saveData = db.loadGameProgress(req.user.id);
+        const saveData = await db.loadGameProgress(req.user.id);
 
         if (!saveData) {
             return res.status(404).json({ error: 'No save data found' });
@@ -351,7 +351,7 @@ app.get('/api/save', authenticateToken, (req, res) => {
 });
 
 // Update coins
-app.post('/api/coins', authenticateToken, (req, res) => {
+app.post('/api/coins', authenticateToken, async (req, res) => {
     try {
         const { amount } = req.body;
 
@@ -359,14 +359,14 @@ app.post('/api/coins', authenticateToken, (req, res) => {
             return res.status(400).json({ error: 'Amount required' });
         }
 
-        const user = db.getUserById(req.user.id);
+        const user = await db.getUserById(req.user.id);
         const newBalance = user.coins + amount;
 
         if (newBalance < 0) {
             return res.status(400).json({ error: 'Insufficient coins' });
         }
 
-        db.updateCoins(req.user.id, newBalance);
+        await db.updateCoins(req.user.id, newBalance);
 
         res.json({ coins: newBalance });
     } catch (error) {
@@ -380,12 +380,12 @@ app.post('/api/coins', authenticateToken, (req, res) => {
 // ============================================================================
 
 // Get game statistics
-app.get('/api/stats', (req, res) => {
+app.get('/api/stats', async (req, res) => {
     try {
         const stats = {
-            totalPlayers: db.getTotalPlayers(),
-            totalGames: db.getTotalGames(),
-            topScore: db.getTopScore()
+            totalPlayers: await db.getTotalPlayers(),
+            totalGames: await db.getTotalGames(),
+            topScore: await db.getTopScore()
         };
         res.json(stats);
     } catch (error) {
@@ -427,6 +427,6 @@ app.listen(PORT, () => {
     console.log(`================================`);
     console.log(`Server: http://localhost:${PORT}`);
     console.log(`API: http://localhost:${PORT}/api`);
-    console.log(`Database: SQLite (game.db)`);
+    console.log(`Database: Supabase`);
     console.log(`================================\n`);
 });

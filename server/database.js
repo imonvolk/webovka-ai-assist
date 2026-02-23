@@ -1,312 +1,293 @@
-const initSqlJs = require('sql.js');
-const fs = require('fs');
-const path = require('path');
-
-const dbPath = path.join(__dirname, '..', 'game.db');
-
-let db = null;
+const { createClient } = require('@supabase/supabase-js');
 
 // ============================================================================
-// DATABASE INITIALIZATION
+// SUPABASE INITIALIZATION
 // ============================================================================
+
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+    console.error('❌ Missing SUPABASE_URL or SUPABASE_ANON_KEY in .env');
+    process.exit(1);
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function initDatabase() {
-    const SQL = await initSqlJs();
-    
-    // Try to load existing database
-    if (fs.existsSync(dbPath)) {
-        const buffer = fs.readFileSync(dbPath);
-        db = new SQL.Database(buffer);
-        console.log('✅ Database loaded from file');
-    } else {
-        db = new SQL.Database();
-        console.log('✅ New database created');
-    }
-
-    // Create tables
-    db.run(`
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT UNIQUE NOT NULL,
-            email TEXT UNIQUE NOT NULL,
-            password TEXT NOT NULL,
-            coins INTEGER DEFAULT 0,
-            high_score INTEGER DEFAULT 0,
-            games_played INTEGER DEFAULT 0,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            last_login DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    `);
-
-    db.run(`
-        CREATE TABLE IF NOT EXISTS scores (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            score INTEGER NOT NULL,
-            level INTEGER NOT NULL,
-            coins INTEGER DEFAULT 0,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-        )
-    `);
-
-    db.run(`
-        CREATE TABLE IF NOT EXISTS game_saves (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER UNIQUE NOT NULL,
-            save_data TEXT NOT NULL,
-            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-        )
-    `);
-
-    // Create indexes
-    db.run(`CREATE INDEX IF NOT EXISTS idx_scores_user_id ON scores(user_id)`);
-    db.run(`CREATE INDEX IF NOT EXISTS idx_scores_score ON scores(score DESC)`);
-    db.run(`CREATE INDEX IF NOT EXISTS idx_scores_created_at ON scores(created_at)`);
-    db.run(`CREATE INDEX IF NOT EXISTS idx_users_username ON users(username)`);
-    db.run(`CREATE INDEX IF NOT EXISTS idx_users_high_score ON users(high_score DESC)`);
-
-    // Save database to file
-    saveDatabase();
-    
-    console.log('✅ Database initialized successfully');
-}
-
-function saveDatabase() {
-    if (db) {
-        const data = db.export();
-        fs.writeFileSync(dbPath, data);
-    }
-}
-
-// Auto-save every 30 seconds
-setInterval(() => {
-    if (db) {
-        saveDatabase();
-    }
-}, 30000);
-
-// Save on exit
-process.on('exit', saveDatabase);
-process.on('SIGINT', () => {
-    saveDatabase();
-    process.exit(0);
-});
-
-// ============================================================================
-// HELPER FUNCTIONS
-// ============================================================================
-
-function executeQuery(sql, params = []) {
-    try {
-        const result = db.exec(sql, params);
-        saveDatabase();
-        return result;
-    } catch (error) {
-        console.error('Query error:', error);
+    // Test connection by querying users table
+    const { error } = await supabase.from('users').select('id').limit(1);
+    if (error) {
+        console.error('❌ Supabase connection error:', error.message);
+        console.error('Make sure you ran supabase-migration.sql in your Supabase SQL Editor!');
         throw error;
     }
-}
-
-function runStatement(sql, params = []) {
-    db.run(sql, params);
-    saveDatabase();
-}
-
-function getOne(sql, params = []) {
-    const result = db.exec(sql, params);
-    if (result.length > 0 && result[0].values.length > 0) {
-        const columns = result[0].columns;
-        const values = result[0].values[0];
-        const row = {};
-        columns.forEach((col, i) => {
-            row[col] = values[i];
-        });
-        return row;
-    }
-    return null;
-}
-
-function getAll(sql, params = []) {
-    const result = db.exec(sql, params);
-    if (result.length > 0) {
-        const columns = result[0].columns;
-        return result[0].values.map(values => {
-            const row = {};
-            columns.forEach((col, i) => {
-                row[col] = values[i];
-            });
-            return row;
-        });
-    }
-    return [];
+    console.log('✅ Supabase connected successfully');
 }
 
 // ============================================================================
-// EXPORTED FUNCTIONS
+// EXPORTED FUNCTIONS (all async – returning Promises)
 // ============================================================================
 
 module.exports = {
     init: initDatabase,
-    
-    // User functions
-    getUserByUsername: (username) => {
-        return getOne('SELECT * FROM users WHERE username = ?', [username]);
+    supabase, // expose client if needed elsewhere
+
+    // ── User functions ──────────────────────────────────────────────────
+
+    getUserByUsername: async (username) => {
+        const { data, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('username', username)
+            .maybeSingle();
+        if (error) throw error;
+        return data;
     },
-    
-    getUserByEmail: (email) => {
-        return getOne('SELECT * FROM users WHERE email = ?', [email]);
+
+    getUserByEmail: async (email) => {
+        const { data, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('email', email)
+            .maybeSingle();
+        if (error) throw error;
+        return data;
     },
-    
-    getUserById: (id) => {
-        return getOne('SELECT * FROM users WHERE id = ?', [id]);
+
+    getUserById: async (id) => {
+        const { data, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', id)
+            .maybeSingle();
+        if (error) throw error;
+        return data;
     },
-    
-    createUser: (username, email, password) => {
-        runStatement(
-            'INSERT INTO users (username, email, password) VALUES (?, ?, ?)',
-            [username, email, password]
-        );
-        const user = getOne('SELECT last_insert_rowid() as id');
-        return user.id;
+
+    createUser: async (username, email, password) => {
+        const { data, error } = await supabase
+            .from('users')
+            .insert({ username, email, password })
+            .select('id')
+            .single();
+        if (error) throw error;
+        return data.id;
     },
-    
-    updateLastLogin: (id) => {
-        runStatement("UPDATE users SET last_login = datetime('now') WHERE id = ?", [id]);
+
+    updateLastLogin: async (id) => {
+        const { error } = await supabase
+            .from('users')
+            .update({ last_login: new Date().toISOString() })
+            .eq('id', id);
+        if (error) throw error;
     },
-    
-    updateHighScore: (id, score) => {
-        runStatement('UPDATE users SET high_score = ? WHERE id = ?', [score, id]);
+
+    updateHighScore: async (id, score) => {
+        const { error } = await supabase
+            .from('users')
+            .update({ high_score: score })
+            .eq('id', id);
+        if (error) throw error;
     },
-    
-    updateCoins: (id, coins) => {
-        runStatement('UPDATE users SET coins = ? WHERE id = ?', [coins, id]);
+
+    updateCoins: async (id, coins) => {
+        const { error } = await supabase
+            .from('users')
+            .update({ coins })
+            .eq('id', id);
+        if (error) throw error;
     },
-    
-    incrementGamesPlayed: (id) => {
-        runStatement('UPDATE users SET games_played = games_played + 1 WHERE id = ?', [id]);
+
+    incrementGamesPlayed: async (id) => {
+        // Fetch current value then increment
+        const { data: user, error: fetchErr } = await supabase
+            .from('users')
+            .select('games_played')
+            .eq('id', id)
+            .single();
+        if (fetchErr) throw fetchErr;
+
+        const { error } = await supabase
+            .from('users')
+            .update({ games_played: (user.games_played || 0) + 1 })
+            .eq('id', id);
+        if (error) throw error;
     },
-    
-    // Score functions
-    submitScore: (userId, score, level, coins) => {
-        runStatement(
-            'INSERT INTO scores (user_id, score, level, coins) VALUES (?, ?, ?, ?)',
-            [userId, score, level, coins]
-        );
-        const result = getOne('SELECT last_insert_rowid() as id');
-        return result.id;
+
+    // ── Score functions ─────────────────────────────────────────────────
+
+    submitScore: async (userId, score, level, coins) => {
+        const { data, error } = await supabase
+            .from('scores')
+            .insert({ user_id: userId, score, level, coins })
+            .select('id')
+            .single();
+        if (error) throw error;
+        return data.id;
     },
-    
-    getUserScores: (userId, limit = 10) => {
-        return getAll(
-            `SELECT score, level, coins, created_at
-             FROM scores
-             WHERE user_id = ?
-             ORDER BY score DESC
-             LIMIT ?`,
-            [userId, limit]
-        );
+
+    getUserScores: async (userId, limit = 10) => {
+        const { data, error } = await supabase
+            .from('scores')
+            .select('score, level, coins, created_at')
+            .eq('user_id', userId)
+            .order('score', { ascending: false })
+            .limit(limit);
+        if (error) throw error;
+        return data || [];
     },
-    
-    getAllTimeLeaderboard: (limit = 100) => {
-        return getAll(
-            `SELECT 
-                u.username,
-                u.high_score as score,
-                u.coins,
-                u.games_played
-             FROM users u
-             WHERE u.high_score > 0
-             ORDER BY u.high_score DESC
-             LIMIT ?`,
-            [limit]
-        );
+
+    getAllTimeLeaderboard: async (limit = 100) => {
+        const { data, error } = await supabase
+            .from('users')
+            .select('username, high_score, coins, games_played')
+            .gt('high_score', 0)
+            .order('high_score', { ascending: false })
+            .limit(limit);
+        if (error) throw error;
+        // Map high_score -> score for API compatibility
+        return (data || []).map(u => ({
+            username: u.username,
+            score: u.high_score,
+            coins: u.coins,
+            games_played: u.games_played
+        }));
     },
-    
-    getDailyLeaderboard: (limit = 100) => {
-        return getAll(
-            `SELECT 
-                u.username,
-                MAX(s.score) as score,
-                SUM(s.coins) as coins,
-                COUNT(s.id) as games_played
-             FROM scores s
-             JOIN users u ON s.user_id = u.id
-             WHERE DATE(s.created_at) = DATE('now')
-             GROUP BY s.user_id
-             ORDER BY score DESC
-             LIMIT ?`,
-            [limit]
-        );
-    },
-    
-    getWeeklyLeaderboard: (limit = 100) => {
-        return getAll(
-            `SELECT 
-                u.username,
-                MAX(s.score) as score,
-                SUM(s.coins) as coins,
-                COUNT(s.id) as games_played
-             FROM scores s
-             JOIN users u ON s.user_id = u.id
-             WHERE DATE(s.created_at) >= DATE('now', '-7 days')
-             GROUP BY s.user_id
-             ORDER BY score DESC
-             LIMIT ?`,
-            [limit]
-        );
-    },
-    
-    getUserRank: (userId) => {
-        const result = getOne(
-            `SELECT COUNT(*) + 1 as rank
-             FROM users
-             WHERE high_score > (
-                 SELECT high_score FROM users WHERE id = ?
-             )`,
-            [userId]
-        );
-        return result ? result.rank : null;
-    },
-    
-    // Game save functions
-    saveGameProgress: (userId, saveData) => {
-        const existing = getOne('SELECT id FROM game_saves WHERE user_id = ?', [userId]);
-        if (existing) {
-            runStatement(
-                `UPDATE game_saves 
-                 SET save_data = ?, updated_at = datetime('now')
-                 WHERE user_id = ?`,
-                [saveData, userId]
-            );
-        } else {
-            runStatement(
-                `INSERT INTO game_saves (user_id, save_data)
-                 VALUES (?, ?)`,
-                [userId, saveData]
-            );
+
+    getDailyLeaderboard: async (limit = 100) => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const todayISO = today.toISOString();
+
+        const { data, error } = await supabase
+            .rpc('get_daily_leaderboard', { since: todayISO, lim: limit });
+
+        if (error) {
+            // Fallback: simple query if RPC not available
+            console.warn('Daily leaderboard RPC not available, using fallback');
+            const { data: scores, error: err2 } = await supabase
+                .from('scores')
+                .select('user_id, score, coins, users!inner(username)')
+                .gte('created_at', todayISO)
+                .order('score', { ascending: false })
+                .limit(limit);
+            if (err2) throw err2;
+            return (scores || []).map(s => ({
+                username: s.users.username,
+                score: s.score,
+                coins: s.coins,
+                games_played: 1
+            }));
         }
+        return data || [];
     },
-    
-    loadGameProgress: (userId) => {
-        const result = getOne('SELECT save_data FROM game_saves WHERE user_id = ?', [userId]);
-        return result ? result.save_data : null;
+
+    getWeeklyLeaderboard: async (limit = 100) => {
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        weekAgo.setHours(0, 0, 0, 0);
+        const weekAgoISO = weekAgo.toISOString();
+
+        const { data, error } = await supabase
+            .rpc('get_weekly_leaderboard', { since: weekAgoISO, lim: limit });
+
+        if (error) {
+            // Fallback: simple query if RPC not available
+            console.warn('Weekly leaderboard RPC not available, using fallback');
+            const { data: scores, error: err2 } = await supabase
+                .from('scores')
+                .select('user_id, score, coins, users!inner(username)')
+                .gte('created_at', weekAgoISO)
+                .order('score', { ascending: false })
+                .limit(limit);
+            if (err2) throw err2;
+            return (scores || []).map(s => ({
+                username: s.users.username,
+                score: s.score,
+                coins: s.coins,
+                games_played: 1
+            }));
+        }
+        return data || [];
     },
-    
-    // Stats functions
-    getTotalPlayers: () => {
-        const result = getOne('SELECT COUNT(*) as count FROM users');
-        return result.count;
+
+    getUserRank: async (userId) => {
+        // Get user's high score
+        const { data: user, error: userErr } = await supabase
+            .from('users')
+            .select('high_score')
+            .eq('id', userId)
+            .single();
+        if (userErr) throw userErr;
+
+        // Count users with higher score
+        const { count, error } = await supabase
+            .from('users')
+            .select('id', { count: 'exact', head: true })
+            .gt('high_score', user.high_score || 0);
+        if (error) throw error;
+
+        return (count || 0) + 1;
     },
-    
-    getTotalGames: () => {
-        const result = getOne('SELECT COUNT(*) as count FROM scores');
-        return result.count;
+
+    // ── Game save functions ─────────────────────────────────────────────
+
+    saveGameProgress: async (userId, saveData) => {
+        // Upsert: insert or update on conflict (user_id is UNIQUE)
+        const { error } = await supabase
+            .from('game_saves')
+            .upsert(
+                {
+                    user_id: userId,
+                    save_data: typeof saveData === 'string' ? JSON.parse(saveData) : saveData,
+                    updated_at: new Date().toISOString()
+                },
+                { onConflict: 'user_id' }
+            );
+        if (error) throw error;
     },
-    
-    getTopScore: () => {
-        const result = getOne('SELECT MAX(high_score) as score FROM users');
-        return result ? result.score || 0 : 0;
+
+    loadGameProgress: async (userId) => {
+        const { data, error } = await supabase
+            .from('game_saves')
+            .select('save_data')
+            .eq('user_id', userId)
+            .maybeSingle();
+        if (error) throw error;
+        if (!data) return null;
+        // Return as string for compatibility with existing code
+        return typeof data.save_data === 'string'
+            ? data.save_data
+            : JSON.stringify(data.save_data);
+    },
+
+    // ── Stats functions ─────────────────────────────────────────────────
+
+    getTotalPlayers: async () => {
+        const { count, error } = await supabase
+            .from('users')
+            .select('id', { count: 'exact', head: true });
+        if (error) throw error;
+        return count || 0;
+    },
+
+    getTotalGames: async () => {
+        const { count, error } = await supabase
+            .from('scores')
+            .select('id', { count: 'exact', head: true });
+        if (error) throw error;
+        return count || 0;
+    },
+
+    getTopScore: async () => {
+        const { data, error } = await supabase
+            .from('users')
+            .select('high_score')
+            .order('high_score', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+        if (error) throw error;
+        return data ? data.high_score || 0 : 0;
     }
 };
