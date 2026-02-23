@@ -17,8 +17,6 @@ let deltaTime = 0;
 let frameCount = 0;
 let fps = 0;
 let fpsUpdateTime = 0;
-const FPS_UPDATE_INTERVAL = 500;
-
 // FPS Counter element
 const fpsCounter = document.getElementById('fps-counter');
 
